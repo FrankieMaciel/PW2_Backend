@@ -12,6 +12,7 @@ const PostSchema = new mongoose.Schema({
   content: { type: String, required: true },
   date: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 },
+  comments: { type: Number, default: 0 },
   score: { type: Number, default: 0 }
 });
 
@@ -30,18 +31,16 @@ class Post {
   }
 
   async create() {
-    try {
-      this.post = new PostModel(this.body);
-      await this.post.save();
-      console.log('Post salvo com sucesso:', this.post);
-    } catch (error) {
-      console.error('Erro ao criar ou salvar o post:', error);
-      this.errors.push(error.message);
-    }
+    this.post = await PostModel.create(this.body)
   }
 
   static async readAll() {
     return await PostModel.find().sort({ date: -1 });
+  }
+
+  static async readById(id) {
+    if (typeof userName !== 'string') return;
+    return await PostModel.findById(id);
   }
 
   static async readByUser(userName) {
@@ -55,23 +54,19 @@ class Post {
 
     const post = await PostModel.findById(id);
 
-    let newTitle = body.title ? body.title : post.title;
-    let newContent = body.content ? body.content : post.content;
-
     const edit = {
-      title: newTitle,
-      content: newContent
+      title: body.title || post.title,
+      content: body.content || post.content
     };
-    await PostModel.findByIdAndUpdate(id, edit, { new: true });
+    return await PostModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   static async delete(id) {
     if (typeof id !== 'string') return;
-    const post = await PostModel.findByIdAndDelete(id);
-    return post;
+    return await PostModel.findByIdAndDelete(id);
   }
 
-  static async like(id, add = true) {
+  static async like(id, add) {
     if (typeof id !== 'string') return;
 
     const post = await PostModel.findById(id);

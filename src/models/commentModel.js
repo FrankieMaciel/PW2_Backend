@@ -30,14 +30,7 @@ class Comment {
   }
 
   async create() {
-    try {
-      this.comment = new CommentModel(this.body);
-      await this.comment.save();
-      console.log('Post salvo com sucesso:', this.comment);
-    } catch (error) {
-      console.error('Erro ao criar ou salvar o post:', error);
-      this.errors.push(error.message);
-    }
+    this.comment = await CommentModel.create(this.body);
   }
 
   static async readAll() {
@@ -46,8 +39,7 @@ class Comment {
 
   static async readByUser(userName) {
     if (typeof userName !== 'string') return;
-    const comments = await CommentModel.find({ 'user.name': userName }).sort({ date: -1 });
-    return comments;
+    return await CommentModel.find({ 'user.name': userName }).sort({ date: -1 });
   }
 
   static async update(id, body) {
@@ -55,12 +47,10 @@ class Comment {
 
     const comment = await CommentModel.findById(id);
 
-    let newContent = body.content ? body.content : comment.content;
-
     const edit = {
-      content: newContent
+      content: body.content || comment.content
     };
-    await CommentModel.findByIdAndUpdate(id, edit, { new: true });
+    return await CommentModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   static async delete(id) {
@@ -81,13 +71,12 @@ class Comment {
       likes: comment.likes + value,
       score: comment.score + newScore
     };
-    await CommentModel.findByIdAndUpdate(id, edit, { new: true });
+    return await CommentModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   static async findPostsComment(postID) {
     if (typeof postID !== 'string') return;
-    const comments = await CommentModel.find({ postId: postID }).sort({ date: -1 });
-    return comments;
+    return await CommentModel.find({ postId: postID }).sort({ date: -1 });
   }
 }
 

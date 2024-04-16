@@ -16,20 +16,12 @@ class Localization {
   }
 
   async create() {
-    try {
-      this.localization = new LocalizationModel(this.body);
-      await this.localization.save();
-      console.log('Localização salvo com sucesso:', this.localization);
-    } catch (error) {
-      console.error('Erro ao criar ou salvar a Localização:', error);
-      this.errors.push(error.message);
-    }
+    this.localization = await LocalizationModel.create(this.body);
   }
 
   static async readByUser(userID) {
     if (typeof userID !== 'string') return;
-    const localization = await LocalizationModel.find({ 'userID': userID });
-    return localization;
+    return await LocalizationModel.find({ 'userID': userID });
   }
 
   static async update(id, body) {
@@ -43,13 +35,12 @@ class Localization {
       lat: newLat,
       lon: newLon
     };
-    await LocalizationModel.findByIdAndUpdate(id, edit, { new: true });
+    return await LocalizationModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   static async delete(id) {
     if (typeof id !== 'string') return;
-    const localization = await LocalizationModel.findByIdAndDelete(id);
-    return localization;
+    return await LocalizationModel.findByIdAndDelete(id);
   }
 }
 

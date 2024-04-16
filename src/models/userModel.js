@@ -101,36 +101,25 @@ class User {
   static async update(id, body) {
     if (typeof id !== 'string') return;
 
-    let user = await UserModel.findById(id);
+    const user = await UserModel.findById(id);
     console.log(body);
-    let isPasswordValid = true;
-    let isEmailValid = true;
 
     if (body.password)
-      if (isPasswordValid = this.body.password.length <= sys.maxPasswordLen && this.body.password.length >= sys.minPasswordLen)
+      if (this.body.password.length <= sys.maxPasswordLen && this.body.password.length >= sys.minPasswordLen)
         this.errors.push(`A senha deve possuir entre ${sys.minPasswordLen} e ${sys.maxPasswordLen} caracteres!`)
 
     if (body.email)
       if (validator.isEmail(this.body.email))
         this.errors.push('Email inválido!');
-
     if (this.errors.length > 0) return;
 
-    let newUsername = body.username ? body.username : user.username;
-    let newUserProfile = body.ProfileUrl ? body.ProfileUrl : user.ProfileUrl;
-    let newEmail = body.email ? body.email : user.email;
-    let newPassword = body.password ? body.password : user.password;
-    let newScore = body.score ? body.score : user.score;
-
     const edit = {
-      username: newUsername,
-      ProfileUrl: newUserProfile,
-      email: newEmail,
-      password: newPassword,
-      score: newScore
+      username: body.username || user.username,
+      profileURL: body.profileURL || user.profileURL,
+      email: body.email || user.email,
+      password: body.password || user.password
     };
-    user = await UserModel.findByIdAndUpdate(id, edit, { new: true });
-    return user;
+   return await UserModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   static async filter(username) {
