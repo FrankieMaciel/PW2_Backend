@@ -4,7 +4,9 @@ const Localization = require(path.resolve(__dirname, '..', 'models', 'userLocali
 
 class LocalizationController {
   async create(req, res) {
-    const localization = await new Localization(req.body);
+    const localization = new Localization(req.body);
+
+    localization.create();
     return res.status(200).json({
       message: 'Localização criada com sucesso!',
       payload: localization

@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   profileURL: { type: String, required: true },
-  userID: {type: String, required: true}
+  id: {type: String, required: true}
 });
 
 const CommentSchema = new mongoose.Schema({
   user: { type: UserSchema, required: true },
-  postId: {type: String, required: true},
+  postId: { type: String, required: true },
   content: { type: String, required: true },
   likes: { type: Number, default: 0 },
   score: { type: Number, default: 0 },
@@ -27,8 +27,6 @@ class Comment {
     this.body = body;
     this.errors = [];
     this.comment = null;
-
-    this.create();
   }
 
   async create() {

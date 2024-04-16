@@ -5,7 +5,9 @@ const Comment = require(path.resolve(__dirname, '..', 'models', 'commentModel'))
 class CommentController {
   async create(req, res) {
     try {
-      const comment = await new Comment(req.body);
+      const comment = new Comment(req.body);
+      
+      await comment.create();
       return res.status(200).json({
         message: 'Comentário Criado com sucesso!',
         payload: comment

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const LocalizationSchema = new mongoose.Schema({
-  userID: { type: String, required: true },
+  userId: { type: String, required: true },
   lat: {type: String, required: true},
   lon: { type: String, required: true },
 });
@@ -13,8 +13,6 @@ class Localization {
     this.body = body;
     this.errors = [];
     this.localization = null;
-
-    this.create();
   }
 
   async create() {
