@@ -2,52 +2,103 @@ const path = require('path');
 
 const Comment = require(path.resolve(__dirname, '..', 'models', 'commentModel'));
 
-const create = async (req, res) => {
-  console.log(req.body);
-  let p = await new Comment(req.body);
-  return res.status(200).send("Comment Criado com sucesso!");
-};
+class CommentController {
+  async create(req, res) {
+    try {
+      const comment = await new Comment(req.body);
+      return res.status(200).json({
+        message: 'Comentário Criado com sucesso!',
+        payload: comment
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
 
-const readAll = async (req, res) => {
-  let comments = await Comment.readAll();
-  return res.status(200).send(comments);
-};
+  async readAll(req, res) {
+    try {
+      const comments = await Comment.readAll();
+      return res.status(200).json(comments);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
 
-const readByUser = async (req, res) => {
-  let user = req.params.id;
-  let comments = await Comment.readByUser(user);
-  return res.status(200).send(comments);
-};
+  async readByUser(req, res) {
+    try {
+      const user = req.params.id;
+      const comments = await Comment.readByUser(user);
+      return res.status(200).json(comments);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
 
-const editPost = async (req, res) => {
-  Comment.update(req.params.id, req.body);
-  return res.status(200).send("Comment atualizado com sucesso!");
-};
+  async update(req, res) {
+    try {
+      const comment = await Comment.update(req.params.id, req.body);
+      return res.status(200).json({
+        message: 'Comentário atualizado com sucesso!',
+        payload: comment
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
 
-const destroy = async (req, res) => {
-  let postID = req.params.id;
-  await Comment.delete(postID);
-  return res.status(200).send("Comment deletado com sucesso!");
-};
+  async destroy(req, res) {
+    try {
+      const postID = req.params.id;
+      const comment = await Comment.deconste(postID);
+      return res.status(200).json({
+        message: 'Comentário deconstado com sucesso!',
+        payload: comment
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
 
-const readFilter = async (req, res) => {
-  let textFilter = req.params.text;
-  const comments = await Comment.readFilter(textFilter);
-  return res.send(comments);
-};
+  async readFilter(req, res) {
+    try {
+      const textFilter = req.params.text;
+      const comments = await Comment.readFilter(textFilter);
+      return res.json(comments);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
 
-const findPostsComment = async (req, res) => {
-  let postId = req.params.id;
-  const comments = await Comment.findPostsComment(postId);
-  return res.status(200).send(comments);
+  async findPostsComment(req, res) {
+    try {
+      const postId = req.params.id;
+      const comments = await Comment.findPostsComment(postId);
+      return res.status(200).json(comments);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
 }
 
-module.exports = {
-  create,
-  readAll,
-  readByUser,
-  editPost,
-  destroy,
-  readFilter,
-  findPostsComment
-};
+module.exports = new CommentController();

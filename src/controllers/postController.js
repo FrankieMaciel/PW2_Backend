@@ -2,45 +2,107 @@ const path = require('path');
 
 const Post = require(path.resolve(__dirname, '..', 'models', 'postModel'));
 
-const create = async (req, res) => {
-  console.log(req.body);
-  let p = await new Post(req.body);
-  return res.status(200).send("Post Criado com sucesso!");
-};
+class PostController {
+  async create(req, res) {
+    try {
+      console.log(req.body);
+      const post = await new Post(req.body);
 
-const readAll = async (req, res) => {
-  let posts = await Post.readAll();
-  return res.status(200).send(posts);
-};
+      if (post.errors.length > 0)
+        return res.status(400).json({
+          message: 'Não foi possível criar postagem!',
+          errors: post.errors,
+        });
 
-const readByUser = async (req, res) => {
-  let username = req.params.username;
-  let posts = await Post.readByUser(username);
-  return res.status(200).send(posts);
-};
+      return res.status(200).json({
+        message: 'Post criado com sucesso!',
+        payload: post
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
 
-const editPost = async (req, res) => {
-  Post.update(req.params.id, req.body);
-  return res.status(200).send("Post atualizado com sucesso!");
-};
+  async readAll(req, res) {
+    try {
+      const posts = await Post.readAll();
 
-const destroy = async (req, res) => {
-  let postID = req.params.id;
-  await Post.delete(postID);
-  return res.status(200).send("Post deletado com sucesso!");
-};
+      return res.status(200).json(posts);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
 
-const readFilter = async (req, res) => {
-  let textFilter = req.params.text;
-  const posts = await Post.readFilter(textFilter);
-  return res.send(posts);
-};
+  async readByUser(req, res) {
+    try {
+      const username = req.params.username;
+      const posts = await Post.readByUser(username);
 
-module.exports = {
-  create,
-  readAll,
-  readByUser,
-  editPost,
-  destroy,
-  readFilter
-};
+      return res.status(200).json(posts);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
+
+  async update(req, res) {
+    try {
+      const post = Post.update(req.params.id, req.body);
+
+      if (post.errors.length > 0)
+        return res.status(400).json({
+          message: 'Não foi possível editar postagem!',
+          errors: post.errors,
+        });
+
+      return res.status(200).json({
+        message: 'Post atualizado com sucesso!',
+        payload: post
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
+
+  async destroy(req, res) {
+    try {
+      const postID = req.params.id;
+      const post = await Post.deconste(postID);
+      return res.status(200).json({
+        message: 'Post deconstado com sucesso!',
+        payload: post
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
+
+  async readFilter(req, res) {
+    try {
+      const textFilter = req.params.text;
+      const posts = await Post.readFilter(textFilter);
+      return res.json(posts);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  };
+}
+
+module.exports = new PostController();

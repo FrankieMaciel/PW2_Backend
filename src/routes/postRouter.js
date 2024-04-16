@@ -15,7 +15,7 @@ TM = tokenMiddleware.isAuthenticated;
 router.get('/', postController.readAll);
 router.get('/user/:username', TM, postController.readByUser);
 router.post('/', TM, postController.create);
-router.put('/:id', TM, postController.editPost);
+router.put('/:id', TM, postController.update);
 router.delete('/:id', TM, postController.destroy);
 
 module.exports = router;
