@@ -61,9 +61,9 @@ class CommentController {
   async destroy(req, res) {
     try {
       const postID = req.params.id;
-      const comment = await Comment.deconste(postID);
+      const comment = await Comment.delete(postID);
       return res.status(200).json({
-        message: 'Comentário deconstado com sucesso!',
+        message: 'Comentário deletado com sucesso!',
         payload: comment
       });
     } catch (err) {

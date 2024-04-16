@@ -30,7 +30,7 @@ class LocalizationController {
     const postID = req.params.id;
     const localization = await Localization.delete(postID);
     return res.status(200).json({
-      message: 'Localização deconstada com sucesso!',
+      message: 'Localização deletada com sucesso!',
       payload: localization
     });
   };

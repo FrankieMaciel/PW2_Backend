@@ -143,9 +143,9 @@ class UserController {
   async destroy(req, res) {
     try {
       const id = req.params.id;
-      const user = await User.deconste(id);
+      const user = await User.delete(id);
       res.status(200).json({
-        message: 'Usuário deconstado com sucesso!',
+        message: 'Usuário deletado com sucesso!',
         payload: user
       });
     } catch (err) {

@@ -6,7 +6,8 @@ class PostController {
   async create(req, res) {
     try {
       console.log(req.body);
-      const post = await new Post(req.body);
+      const post = new Post(req.body);
+      await post.create();
 
       if (post.errors.length > 0)
         return res.status(400).json({
@@ -78,9 +79,9 @@ class PostController {
   async destroy(req, res) {
     try {
       const postID = req.params.id;
-      const post = await Post.deconste(postID);
+      const post = await Post.delete(postID);
       return res.status(200).json({
-        message: 'Post deconstado com sucesso!',
+        message: 'Post deletado com sucesso!',
         payload: post
       });
     } catch (err) {
