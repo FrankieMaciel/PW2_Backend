@@ -18,7 +18,9 @@ const create = async (req, res) => {
         'Não foi possível registrar um usuário!'
       );
       console.log(user.errors);
-      return res.status(500).send('Ocorreu um erro no servidor.');
+      return res.status(400).json({
+        errors: user.errors,
+      });
     }
 
     const token = jwt.sign({
@@ -34,10 +36,12 @@ const create = async (req, res) => {
       score: user.user.score
     };
 
-    return res.status(200).send(JSON.stringify(obj));
+    return res.status(200).json(obj);
   } catch (e) {
     console.log(e);
-    return res.status(500).send('Ocorreu um erro no servidor.');
+    return res.status(500).json({
+      errors: ['Ocorreu um erro no servidor.']
+    });
   }
 };
 
@@ -47,10 +51,8 @@ const login = async (req, res) => {
     const user = new User(req.body);
     await user.login();
 
-    if (user.errors.length > 0) {
-      const erro = new Error(JSON.stringify(user.errors));
-      return res.send({ error: erro.message });
-    }
+    if (user.errors.length > 0) 
+      return res.status(400).json({ errors: user.errors });
 
     const token = jwt.sign({
       id: user._id, nome: user.user.username
@@ -66,34 +68,62 @@ const login = async (req, res) => {
     };
     console.log(obj);
 
-    return res.status(200).send(JSON.stringify(obj));
+    return res.status(200).json(obj);
   } catch (e) {
     console.log(e);
-    return res.status(500).send('Ocorreu um erro no servidor.');
+    return res.status(500).json({
+      errors: ['Ocorreu um erro no servidor.']
+    });
   }
 };
 
 const readAll = async (req, res) => {
-  let users = await User.readAll();
-  return res.status(200).send(users);
+  try {
+    let users = await User.readAll();
+    return res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({
+      errors: ['Ocorreu um erro no servidor']
+    })
+  }
 };
 
 const readById = async (req, res) => {
-  let user = await User.readById(req.params.id);
-  return res.status(200).send(user);
+  try {
+    let user = await User.readById(req.params.id);
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({
+      errors: ['Ocorreu um erro no servidor']
+    })
+  }
 };
 
 const update = async (req, res) => {
-  const user = await User.update(req.params.id, req.body);
-  return res.status(200).send(user);
+  try {
+    const user = await User.update(req.params.id, req.body);
+
+    if (user.errors.length > 0)
+      return res.status(401).json({
+        errors: user.errors
+      })
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({
+      errors: ['Ocorreu um erro no servidor']
+    })
+  }
 };
 
-const ChangeProfile = async (req, res) => {
+const changeProfile = async (req, res) => {
   console.log('Recebi uma imagem!');
-  return res.status(200).send("Alguma coisa chegou!");
+  return res.status(200).json({
+    message: ['Alguma coisa chegou!']
+  });
 };
 
-const SendProfile = async (req, res) => {
+const sendProfile = async (req, res) => {
 
   const id = req.params.id;
 
@@ -102,16 +132,22 @@ const SendProfile = async (req, res) => {
   console.log(imageContent);
   res.set('Content-Type', 'image/jpeg');
 
-  return res.status(200).send(imageContent);
+  return res.status(200).json(imageContent);
 };
 
 const destroy = async (req, res) => {
   try {
     const id = req.params.id;
     const user = await User.delete(id);
-    res.status(200).send(`Post deletado com sucesso!\n${user}`);
+    res.status(200).json({
+      message: 'Usuário deletado com sucesso!',
+      payload: user
+    });
   } catch (error) {
-    res.status(500).send(`Deu erro aqui no deletar post!\n${error}`);
+    res.status(500).json({
+      message: 'Deu erro aqui no deletar post!',
+      errors: [ error ]
+    });
   }
 };
 
@@ -121,7 +157,7 @@ module.exports = {
   readAll,
   readById,
   update,
-  ChangeProfile,
-  SendProfile,
+  changeProfile,
+  sendProfile,
   destroy,
 };

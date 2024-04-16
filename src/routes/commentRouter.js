@@ -11,8 +11,8 @@ TM = tokenMiddleware.isAuthenticated;
 
 router.post('/',TM, commentController.create);
 router.get('/',TM, commentController.readAll);
-router.get('/delete/:id',TM, commentController.destroy);
-router.post('/edit/:id',TM, commentController.editPost);
+router.delete('/:id',TM, commentController.destroy);
+router.put('/:id',TM, commentController.editPost);
 router.get('/user/:id',TM, commentController.readByUser);
 router.get('/post/:id',TM, commentController.findPostsComment);
 

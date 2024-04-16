@@ -29,7 +29,7 @@ class User {
 
     if (!this.body.password) {
       this.errors.push(
-        'Ah senha provavelmente é undefined'
+        'A senha provavelmente é undefined'
       );
       return;
     }
@@ -46,7 +46,7 @@ class User {
 
     const hasName = await UserModel.findOne({ username: this.body.username });
     const isEmailValid = validator.isEmail(this.body.email);
-
+    
     if (!isEmailValid) this.errors.push(
       'Email inválido!'
     );
@@ -57,9 +57,9 @@ class User {
       'Usuário já cadastrado!'
     );
   }
-
+  
   async register() {
-    this.validate('register');
+    await this.validate('register');
     if (this.errors.length > 0) return;
 
     const salt = bcryptjs.genSaltSync();
@@ -103,6 +103,18 @@ class User {
 
     let user = await UserModel.findById(id);
     console.log(body);
+    let isPasswordValid = true;
+    let isEmailValid = true;
+
+    if (body.password)
+      if (isPasswordValid = this.body.password.length <= sys.maxPasswordLen && this.body.password.length >= sys.minPasswordLen)
+        this.errors.push(`A senha deve possuir entre ${sys.minPasswordLen} e ${sys.maxPasswordLen} caracteres!`)
+
+    if (body.email)
+      if (validator.isEmail(this.body.email))
+        this.errors.push('Email inválido!');
+
+    if (this.errors.length > 0) return;
 
     let newUsername = body.username ? body.username : user.username;
     let newUserProfile = body.ProfileUrl ? body.ProfileUrl : user.ProfileUrl;
@@ -128,6 +140,18 @@ class User {
   static async delete(id) {
     if (typeof id !== 'string') return;
     const user = await UserModel.findByIdAndDelete(id);
+    return user;
+  }
+
+  static async score(id, score) {
+    if (typeof id !== 'string') return;
+
+    let user = await UserModel.findById(id);
+
+    const edit = {
+      score: user.score + score
+    };
+    user = await UserModel.findByIdAndUpdate(id, edit, { new: true });
     return user;
   }
 

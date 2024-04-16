@@ -11,6 +11,8 @@ const PostSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
   date: { type: Date, default: Date.now },
+  likes: { type: Number, default: 0 },
+  score: { type: Number, default: 0 }
 });
 
 PostSchema.index(
@@ -69,6 +71,21 @@ class Post {
     if (typeof id !== 'string') return;
     const post = await PostModel.findByIdAndDelete(id);
     return post;
+  }
+
+  static async like(id, add = true) {
+    if (typeof id !== 'string') return;
+
+    const post = await PostModel.findById(id);
+
+    const value = add ? 1 : -1;
+    const newScore = add ? 5 : -5; 
+
+    const edit = {
+      likes: post.likes + value,
+      score: post.score + newScore,
+    };
+    await PostModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   static async filter(text) {

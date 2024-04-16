@@ -16,11 +16,11 @@ TM = tokenMiddleware.isAuthenticated;
 
 router.post('/', userController.create);
 router.get('/',TM, userController.readAll);
-router.get('/:id',TM, userController.readById);
 router.post('/login', userController.login);
-router.post('/edit/:id',TM, userController.update);
-router.post('/profilePicture/:id',TM, multer.parser.single('pf-picture'), userController.ChangeProfile);
+router.get('/:id',TM, userController.readById);
+router.put('/:id',TM, userController.update);
+router.delete('/:id',TM, userController.destroy);
 router.get('/profilePicture/:id',TM, userController.SendProfile);
-router.get('/delete/:id',TM, userController.destroy);
+router.post('/profilePicture/:id',TM, multer.parser.single('pf-picture'), userController.ChangeProfile);
 
 module.exports = router;

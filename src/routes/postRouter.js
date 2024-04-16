@@ -12,10 +12,10 @@ const tokenMiddleware = require(path.resolve(
 
 TM = tokenMiddleware.isAuthenticated;
 
+router.get('/', postController.readAll);
 router.post('/',TM, postController.create);
-router.get('/',TM, postController.readAll);
-router.get('/delete/:id',TM, postController.destroy);
-router.post('/edit/:id',TM, postController.editPost);
+router.put('/:id',TM, postController.editPost);
+router.delete('/:id',TM, postController.destroy);
 router.get('/user/:username',TM, postController.readByUser);
 
 module.exports = router;

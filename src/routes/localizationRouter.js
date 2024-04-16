@@ -10,8 +10,8 @@ const tokenMiddleware = require(path.resolve(
 TM = tokenMiddleware.isAuthenticated;
 
 router.post('/',TM, localizationController.create);
-router.get('/delete/:id',TM, localizationController.destroy);
-router.post('/edit/:id',TM, localizationController.edit);
+router.delete('/:id',TM, localizationController.destroy);
+router.put('/:id',TM, localizationController.edit);
 router.get('/user/:id',TM, localizationController.readByUser);
 
 module.exports = router;

@@ -10,6 +10,8 @@ const CommentSchema = new mongoose.Schema({
   user: { type: UserSchema, required: true },
   postId: {type: String, required: true},
   content: { type: String, required: true },
+  likes: { type: Number, default: 0 },
+  score: { type: Number, default: 0 },
   date: { type: Date, default: Date.now },
 });
 
@@ -67,6 +69,21 @@ class Comment {
     if (typeof id !== 'string') return;
     const comment = await CommentModel.findByIdAndDelete(id);
     return comment;
+  }
+
+  static async like(id, add = true) {
+    if (typeof id !== 'string') return;
+
+    const comment = await CommentModel.findById(id);
+
+    const value = add ? 1 : -1;
+    const newScore = add ? 10 : -10;
+
+    const edit = {
+      likes: comment.likes + value,
+      score: comment.score + newScore
+    };
+    await CommentModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   static async findPostsComment(postID) {
