@@ -19,7 +19,7 @@ router.get('/', TM, userController.readAll);
 router.post('/login', userController.login);
 router.get('/:id', TM, userController.readById);
 router.put('/:id', TM, userController.update);
-router.delete('/:id', TM, userController.destroy);
+router.delete('/:id', TM, userController.delete);
 router.get('/profilePicture/:id', TM, userController.sendProfile);
 router.post('/profilePicture/:id', TM, multer.parser.single('pf-picture'), userController.changeProfile);
 

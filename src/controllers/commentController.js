@@ -58,7 +58,7 @@ class CommentController {
     }
   };
 
-  async destroy(req, res) {
+  async delete(req, res) {
     try {
       const postID = req.params.id;
       const comment = await Comment.delete(postID);

@@ -1,14 +1,14 @@
 const path = require('path');
 
 const Post = require(path.resolve(__dirname, '..', 'models', 'postModel'));
+const User = require(path.resolve(__dirname, '..', 'models', 'userModel'));
 
 class PostController {
   async create(req, res) {
     try {
-      console.log(req.body);
       const post = new Post(req.body);
-      await post.create();
 
+      await post.create();
       if (post.errors.length > 0)
         return res.status(400).json({
           message: 'Não foi possível criar postagem!',
@@ -76,7 +76,7 @@ class PostController {
     }
   };
 
-  async destroy(req, res) {
+  async delete(req, res) {
     try {
       const postID = req.params.id;
       const post = await Post.delete(postID);

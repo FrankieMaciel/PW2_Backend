@@ -16,6 +16,6 @@ router.get('/', postController.readAll);
 router.get('/user/:username', TM, postController.readByUser);
 router.post('/', TM, postController.create);
 router.put('/:id', TM, postController.update);
-router.delete('/:id', TM, postController.destroy);
+router.delete('/:id', TM, postController.delete);
 
 module.exports = router;

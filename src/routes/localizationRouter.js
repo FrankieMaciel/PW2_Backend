@@ -12,6 +12,6 @@ TM = tokenMiddleware.isAuthenticated;
 router.get('/user/:id', TM, localizationController.readByUser);
 router.post('/', TM, localizationController.create);
 router.put('/:id', TM, localizationController.update);
-router.delete('/:id', TM, localizationController.destroy);
+router.delete('/:id', TM, localizationController.delete);
 
 module.exports = router;

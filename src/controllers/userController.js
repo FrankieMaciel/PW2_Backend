@@ -140,7 +140,7 @@ class UserController {
     return res.status(200).json(imageContent);
   };
 
-  async destroy(req, res) {
+  async delete(req, res) {
     try {
       const id = req.params.id;
       const user = await User.delete(id);

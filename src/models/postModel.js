@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
+  id: { type: String, required: true },
   name: { type: String, required: true },
   profileURL: { type: String, required: true },
-  userID: {type: String, required: true}
 });
 
 const PostSchema = new mongoose.Schema({
@@ -27,8 +27,6 @@ class Post {
     this.body = body;
     this.errors = [];
     this.post = null;
-
-    this.create();
   }
 
   async create() {
@@ -79,7 +77,7 @@ class Post {
     const post = await PostModel.findById(id);
 
     const value = add ? 1 : -1;
-    const newScore = add ? 5 : -5; 
+    const newScore = add ? 5 : -5;
 
     const edit = {
       likes: post.likes + value,

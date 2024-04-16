@@ -4,7 +4,6 @@ const Localization = require(path.resolve(__dirname, '..', 'models', 'userLocali
 
 class LocalizationController {
   async create(req, res) {
-    console.log(req.body);
     const localization = await new Localization(req.body);
     return res.status(200).json({
       message: 'Localização criada com sucesso!',
@@ -26,7 +25,7 @@ class LocalizationController {
     });
   };
 
-  async destroy(req, res) {
+  async delete(req, res) {
     const postID = req.params.id;
     const localization = await Localization.delete(postID);
     return res.status(200).json({
