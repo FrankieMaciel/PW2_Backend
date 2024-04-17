@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const bcryptjs = require('bcryptjs');
 const validator = require('validator');
 
+const ErrorType = require('../config/ErrorType');
+
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true },
   email: { type: String, required: true },
@@ -28,9 +30,10 @@ class User {
     this.cleanUp();
 
     if (!this.body.password) {
-      this.errors.push(
-        'A senha provavelmente é undefined'
-      );
+      this.errors.push({
+        type: ErrorType.USERNAME,
+        message: 'Campo "senha" não pode estar vazio!'
+      });
       return;
     }
 
@@ -39,25 +42,29 @@ class User {
 
     const user = await UserModel.findOne({ email: this.body.email });
 
-    if (!isPasswordValid) this.errors.push(
-      `A senha deve possuir entre ${sys.minPasswordLen} e ${sys.maxPasswordLen} caracteres!`
-    );
+    if (!isPasswordValid) this.errors.push({
+      type: ErrorType.PASSWORD,
+      message: `A senha deve possuir entre ${sys.minPasswordLen} e ${sys.maxPasswordLen} caracteres!`
+    });
     if (validateMode === 'login') return user;
 
     const hasName = await UserModel.findOne({ username: this.body.username });
     const isEmailValid = validator.isEmail(this.body.email);
-    
-    if (!isEmailValid) this.errors.push(
-      'Email inválido!'
-    );
-    if (hasName) this.errors.push(
-      'Nome de usuário indisponível!'
-    );
-    if (user) this.errors.push(
-      'Usuário já cadastrado!'
-    );
+
+    if (!isEmailValid) this.errors.push({
+      type: ErrorType.EMAIL,
+      message: 'Email inválido!'
+    });
+    if (hasName) this.errors.push({
+      type: ErrorType.USERNAME,
+      message: 'Nome de usuário indisponível!'
+    });
+    if (user) this.errors.push({
+      type: ErrorType.EMAIL,
+      message: 'Usuário já cadastrado!'
+    });
   }
-  
+
   async register() {
     await this.validate('register');
     if (this.errors.length > 0) return;
@@ -82,7 +89,10 @@ class User {
     this.user = user;
 
     if (!bcryptjs.compareSync(this.body.password, this.user.password)) {
-      this.errors.push('Senha inválida!');
+      this.errors.push({
+        type: ErrorType.PASSWORD,
+        message: 'Senha incorreta!'
+      });
       this.user = null;
       return;
     }
@@ -106,11 +116,17 @@ class User {
 
     if (body.password)
       if (body.password.length <= sys.maxPasswordLen && body.password.length >= sys.minPasswordLen)
-        user.errors.push(`A senha deve possuir entre ${sys.minPasswordLen} e ${sys.maxPasswordLen} caracteres!`)
+        user.errors.push({
+          type: ErrorType.PASSWORD,
+          message: `A senha deve possuir entre ${sys.minPasswordLen} e ${sys.maxPasswordLen} caracteres!`
+        });
 
     if (body.email)
       if (validator.isEmail(body.email))
-        user.errors.push('Email inválido!');
+        user.errors.push({
+          type: ErrorType.EMAIL,
+          message: 'Email inválido!'
+        });
     if (user.errors.length > 0) return user;
 
     const edit = {
@@ -119,7 +135,7 @@ class User {
       email: body.email || user.email,
       password: body.password || user.password
     };
-   return await UserModel.findByIdAndUpdate(id, edit, { new: true });
+    return await UserModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   static async filter(username) {
@@ -128,8 +144,7 @@ class User {
 
   static async delete(id) {
     if (typeof id !== 'string') return;
-    const user = await UserModel.findByIdAndDelete(id);
-    return user;
+    return await UserModel.findByIdAndDelete(id);
   }
 
   static async score(id, score) {

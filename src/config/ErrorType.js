@@ -1,0 +1,6 @@
+module.exports = {
+  USERNAME: 'USERNAME',
+  EMAIL: 'EMAIL',
+  PASSWORD: 'PASSWORD',
+  SERVER: 'SERVER'
+};

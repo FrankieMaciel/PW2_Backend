@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  profileURL: { type: String, required: true },
-  id: { type: String, required: true }
+
 });
 
 const CommentSchema = new mongoose.Schema({
-  user: { type: UserSchema, required: true },
+  user: {
+    name: { type: String, required: true },
+    profileURL: { type: String, required: true },
+    id: { type: String, required: true }
+  },
   postId: { type: String, required: true },
   content: { type: String, required: true },
   likes: { type: Number, default: 0 },
@@ -55,8 +57,7 @@ class Comment {
 
   static async delete(id) {
     if (typeof id !== 'string') return;
-    const comment = await CommentModel.findByIdAndDelete(id);
-    return comment;
+    return await CommentModel.findByIdAndDelete(id);
   }
 
   static async like(id, add = true) {

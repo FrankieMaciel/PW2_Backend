@@ -2,6 +2,7 @@ const path = require('path');
 
 const Post = require(path.resolve(__dirname, '..', 'models', 'postModel'));
 const scoreController = require(path.resolve(__dirname, 'scoreController'));
+const ErrorType = require('../config/ErrorType');
 
 class PostController {
   async create(req, res) {
@@ -17,12 +18,23 @@ class PostController {
 
       return res.status(200).json({
         message: 'Post criado com sucesso!',
-        payload: post.post
+        payload: {
+          id: post.post._id,
+          title: post.post.title,
+          content: post.post.content,
+          likes: post.post.likes,
+          comments: post.post.comments,
+          score: post.post.score,
+          user: post.post.user
+        }
       });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -30,12 +42,26 @@ class PostController {
   async readAll(req, res) {
     try {
       const posts = await Post.readAll();
+      const arr = posts.map(post => {
+        return {
+          id: post._id,
+          title: post.title,
+          content: post.content,
+          likes: post.likes,
+          comments: post.comments,
+          score: post.score,
+          user: post.user
+        };
+      });
 
-      return res.status(200).json(posts);
+      return res.status(200).json(arr);
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -44,12 +70,26 @@ class PostController {
     try {
       const username = req.params.username;
       const posts = await Post.readByUser(username);
+      const arr = posts.map(post => {
+        return {
+          id: post._id,
+          title: post.title,
+          content: post.content,
+          likes: post.likes,
+          comments: post.comments,
+          score: post.score,
+          user: post.user
+        };
+      });
 
-      return res.status(200).json(posts);
+      return res.status(200).json(arr);
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -60,12 +100,23 @@ class PostController {
 
       return res.status(200).json({
         message: 'Post atualizado com sucesso!',
-        payload: post
+        payload: {
+          id: post._id,
+          title: post.title,
+          content: post.content,
+          likes: post.likes,
+          comments: post.comments,
+          score: post.score,
+          user: post.user
+        }
       });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -77,12 +128,23 @@ class PostController {
       await scoreController.post(post.user.id, false);
       return res.status(200).json({
         message: 'Post deletado com sucesso!',
-        payload: post
+        payload: {
+          id: post._id,
+          title: post.title,
+          content: post.content,
+          likes: post.likes,
+          comments: post.comments,
+          score: post.score,
+          user: post.user
+        }
       });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -91,11 +153,25 @@ class PostController {
     try {
       const textFilter = req.params.text;
       const posts = await Post.readFilter(textFilter);
-      return res.json(posts);
+      const arr = posts.map(post => {
+        return {
+          id: post._id,
+          title: post.title,
+          content: post.content,
+          likes: post.likes,
+          comments: post.comments,
+          score: post.score,
+          user: post.user
+        };
+      });
+      return res.status(200).json(arr);
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };

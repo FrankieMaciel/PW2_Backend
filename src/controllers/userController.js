@@ -7,6 +7,7 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 
 const User = require(path.resolve(__dirname, '..', 'models', 'userModel'));
+const ErrorType = require('../config/ErrorType');
 
 class UserController {
   async create(req, res) {
@@ -39,7 +40,10 @@ class UserController {
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -60,20 +64,24 @@ class UserController {
         id: user._id, nome: user.user.username
       }, secretKey);
 
-      const obj = {
-        token: token,
-        id: user.user._id,
-        username: user.user.username,
-        email: user.user.email,
-        profileURL: user.user.profileURL,
-        score: user.user.score
-      };
-
-      return res.status(200).json(obj);
+      return res.status(200).json({
+        message: 'Usuário logado com sucesso!',
+        payload: {
+          token: token,
+          id: user.user._id,
+          username: user.user.username,
+          email: user.user.email,
+          profileURL: user.user.profileURL,
+          score: user.user.score
+        }
+      });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -81,10 +89,22 @@ class UserController {
   async readAll(req, res) {
     try {
       const users = await User.readAll();
-      return res.status(200).json(users);
+      const arr = users.map(user => {
+        return {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          profileURL: user.profileURL,
+          score: user.score
+        };
+      });
+      return res.status(200).json(arr);
     } catch (err) {
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -92,7 +112,13 @@ class UserController {
   async readById(req, res) {
     try {
       const user = await User.readById(req.params.id);
-      return res.status(200).json(user);
+      return res.status(200).json({
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        profileURL: user.profileURL,
+        score: user.score
+      });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
@@ -110,7 +136,16 @@ class UserController {
           errors: user.errors
         });
 
-      return res.status(200).json(user);
+      return res.status(200).json({
+        message: 'Dados do usuário alterados com sucesso!',
+        payload: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          profileURL: user.profileURL,
+          score: user.score
+        }
+      });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
@@ -144,12 +179,21 @@ class UserController {
       const user = await User.delete(id);
       res.status(200).json({
         message: 'Usuário deletado com sucesso!',
-        payload: user
+        payload: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          profileURL: user.profileURL,
+          score: user.score
+        }
       });
     } catch (err) {
       console.log(err);
       res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };

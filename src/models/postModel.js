@@ -1,13 +1,11 @@
 const mongoose = require('mongoose');
 
-const UserSchema = new mongoose.Schema({
-  id: { type: String, required: true },
-  name: { type: String, required: true },
-  profileURL: { type: String, required: true },
-});
-
 const PostSchema = new mongoose.Schema({
-  user: { type: UserSchema, required: true },
+  user: {
+    id: { type: String, required: true },
+    name: { type: String, required: true },
+    profileURL: { type: String, required: true },
+  },
   title: { type: String, required: true },
   content: { type: String, required: true },
   date: { type: Date, default: Date.now },

@@ -2,6 +2,7 @@ const path = require('path');
 
 const Comment = require(path.resolve(__dirname, '..', 'models', 'commentModel'));
 const scoreController = require(path.resolve(__dirname, 'scoreController'));
+const ErrorType = require('../config/ErrorType');
 
 class CommentController {
   async create(req, res) {
@@ -11,12 +12,22 @@ class CommentController {
       await scoreController.comment(comment.comment.user.id, comment.comment.postId);
       return res.status(200).json({
         message: 'Comentário Criado com sucesso!',
-        payload: comment.comment
+        payload: {
+          id: comment.comment.id,
+          content: comment.comment.content,
+          likes: comment.comment.likes,
+          score: comment.comment.score,
+          postId: comment.comment.postId,
+          user: comment.comment.user,
+        }
       });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -24,11 +35,24 @@ class CommentController {
   async readAll(req, res) {
     try {
       const comments = await Comment.readAll();
-      return res.status(200).json(comments);
+      const arr = comments.map(comment => {
+        return {
+          id: comment.id,
+          content: comment.content,
+          likes: comment.likes,
+          score: comment.score,
+          postId: comment.postId,
+          user: comment.user,
+        };
+      });
+      return res.status(200).json(arr);
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -37,11 +61,24 @@ class CommentController {
     try {
       const user = req.params.username;
       const comments = await Comment.readByUser(user);
-      return res.status(200).json(comments);
+      const arr = comments.map(comment => {
+        return {
+          id: comment.id,
+          content: comment.content,
+          likes: comment.likes,
+          score: comment.score,
+          postId: comment.postId,
+          user: comment.user,
+        };
+      });
+      return res.status(200).json(arr);
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -51,12 +88,22 @@ class CommentController {
       const comment = await Comment.update(req.params.id, req.body);
       return res.status(200).json({
         message: 'Comentário atualizado com sucesso!',
-        payload: comment
+        payload: {
+          id: comment.id,
+          content: comment.content,
+          likes: comment.likes,
+          score: comment.score,
+          postId: comment.postId,
+          user: comment.user,
+        }
       });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -68,12 +115,22 @@ class CommentController {
       await scoreController.comment(comment.user.id, comment.postId, false);
       return res.status(200).json({
         message: 'Comentário deletado com sucesso!',
-        payload: comment
+        payload: {
+          id: comment.id,
+          content: comment.content,
+          likes: comment.likes,
+          score: comment.score,
+          postId: comment.postId,
+          user: comment.user,
+        }
       });
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -82,11 +139,24 @@ class CommentController {
     try {
       const textFilter = req.params.text;
       const comments = await Comment.readFilter(textFilter);
-      return res.json(comments);
+      const arr = comments.map(comment => {
+        return {
+          id: comment.id,
+          content: comment.content,
+          likes: comment.likes,
+          score: comment.score,
+          postId: comment.postId,
+          user: comment.user,
+        };
+      });
+      return res.status(200).json(arr);
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
@@ -99,7 +169,10 @@ class CommentController {
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        errors: ['Ocorreu um erro no servidor!']
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
       });
     }
   };
