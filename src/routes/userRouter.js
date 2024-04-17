@@ -2,17 +2,12 @@ const path = require('path');
 const express = require('express');
 const router = express.Router();
 
-const userController = require(path.resolve(
-  __dirname, '..', 'controllers', 'userController')
-);
+const userController = require(path.resolve(__dirname, '..', 'controllers', 'userController'));
 
-const tokenMiddleware = require(path.resolve(
-  __dirname, '..', 'middlewares', 'tokenMiddleware')
-);
+const tokenMiddleware = require(path.resolve(__dirname, '..', 'middlewares', 'tokenMiddleware'));
+TM = tokenMiddleware.isAuthenticated;
 
 const multer = require(path.resolve(__dirname, '..', 'lib', 'multer'));
-
-TM = tokenMiddleware.isAuthenticated;
 
 router.get('/', userController.readAll);
 router.get('/:id', userController.readById);

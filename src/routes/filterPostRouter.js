@@ -1,7 +1,8 @@
 const express = require('express');
 const path = require('path');
 const router = express.Router();
-const filterPostController = require('../controllers/filterPostController');
+
+const filterPostController = require(path.resolve(__dirname, '..', 'controllers', 'filterPostController'));
 
 const tokenMiddleware = require(path.resolve(__dirname, '..', 'middlewares', 'tokenMiddleware'));
 TM = tokenMiddleware.isAuthenticated;

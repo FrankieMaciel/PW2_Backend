@@ -1,8 +1,9 @@
 const express = require('express');
 const path = require('path');
 const router = express.Router();
-const commentController = require('../controllers/commentController');
-const scoreController = require('../controllers/scoreController');
+
+const commentController = require(path.resolve(__dirname, '..', 'controllers', 'commentController'));
+const scoreController = require(path.resolve(__dirname, '..', 'controllers', 'scoreController'));
 
 const tokenMiddleware = require(path.resolve(__dirname, '..', 'middlewares', 'tokenMiddleware'));
 TM = tokenMiddleware.isAuthenticated;

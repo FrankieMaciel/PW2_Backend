@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const bcryptjs = require('bcryptjs');
 const validator = require('validator');
+const path = require('path');
 
-const ErrorType = require('../config/ErrorType');
+const ErrorType = require(path.resolve(__dirname, '..', 'config', 'ErrorType'));
 
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true },

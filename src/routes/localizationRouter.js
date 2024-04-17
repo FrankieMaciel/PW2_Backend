@@ -1,7 +1,8 @@
 const express = require('express');
 const path = require('path');
 const router = express.Router();
-const localizationController = require('../controllers/localizationController');
+
+const localizationController = require(path.resolve(__dirname, '..', 'controllers', 'localizationController'));
 
 const tokenMiddleware = require(path.resolve(__dirname, '..', 'middlewares', 'tokenMiddleware'));
 TM = tokenMiddleware.isAuthenticated;

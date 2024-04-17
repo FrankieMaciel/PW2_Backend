@@ -7,7 +7,7 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 
 const User = require(path.resolve(__dirname, '..', 'models', 'userModel'));
-const ErrorType = require('../config/ErrorType');
+const ErrorType = require(path.resolve(__dirname, '..', 'config', 'ErrorType'));
 
 class UserController {
   async create(req, res) {
