@@ -1,19 +1,19 @@
 const path = require('path');
 
 const Post = require(path.resolve(__dirname, '..', 'models', 'postModel'));
-const User = require(path.resolve(__dirname, '..', 'models', 'userModel'));
+const scoreController = require(path.resolve(__dirname, 'scoreController'));
 
 class PostController {
   async create(req, res) {
     try {
       const post = new Post(req.body);
-
       await post.create();
       if (post.errors.length > 0)
         return res.status(400).json({
           message: 'Não foi possível criar postagem!',
           errors: post.errors,
         });
+      await scoreController.post(post.post.id);
 
       return res.status(200).json({
         message: 'Post criado com sucesso!',
@@ -74,6 +74,7 @@ class PostController {
     try {
       const postID = req.params.id;
       const post = await Post.delete(postID);
+      await scoreController.post(postId, false);
       return res.status(200).json({
         message: 'Post deletado com sucesso!',
         payload: post

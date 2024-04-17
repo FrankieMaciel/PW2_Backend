@@ -15,7 +15,6 @@ class UserController {
 
       await user.register();
       if (user.errors.length > 0) {
-        console.log(user.errors);
         return res.status(400).json({
           message: 'Não foi possível registrar um usuário!',
           errors: user.errors,
@@ -69,7 +68,6 @@ class UserController {
         profileURL: user.user.profileURL,
         score: user.user.score
       };
-      console.log(obj);
 
       return res.status(200).json(obj);
     } catch (err) {
@@ -106,8 +104,7 @@ class UserController {
   async update(req, res) {
     try {
       const user = await User.update(req.params.id, req.body);
-
-      if (user.errors.length > 0)
+      if (user.errors)
         return res.status(401).json({
           message: 'Não foi possível atualizar dados do usuário!',
           errors: user.errors
@@ -115,6 +112,7 @@ class UserController {
 
       return res.status(200).json(user);
     } catch (err) {
+      console.log(err);
       return res.status(500).json({
         errors: ['Ocorreu um erro no servidor']
       });

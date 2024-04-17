@@ -6,17 +6,39 @@ const Comment = require(path.resolve(__dirname, '..', 'models', 'commentModel'))
 
 const points = {
   like: 5,
-  comment: 10,
+  post: 10,
 };
 
 class ScoreController {
+  async post(userId, add = true) {
+    try {
+      await User.score(userId, points.post * (add ? 1 : -1));
+      return;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
+  async comment(userId, postId, add = true) {
+    try {
+      await User.score(userId, points.post * (add ? 1 : -1));
+      await Post.score(postId, points.post * (add ? 1 : -1));
+      await User.score(post.user.id, points.post * (add ? 1 : -1));
+      return;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
   async likePost(req, res) {
     try {
-      const { id, add } = req.params;
+      const id = req.params.id;
+      const add = req.body.add;
+
       const post = await Post.like(id, add);
       const user = await User.score(post.user.id, points.like * (add ? 1 : -1));
       return res.status(200).json({
-        message: `Post ${!add && 'des'}curtido com sucesso!`,
+        message: `Postagem ${add ? '' : 'des'}curtida com sucesso!`,
         payload: {
           user: {
             name: user.username,
@@ -39,12 +61,14 @@ class ScoreController {
 
   async likeComment(req, res) {
     try {
-      const { id, add } = req.params;
+      const id = req.params.id;
+      const add = req.body.add;
+
       const comment = await Comment.like(id, add);
-      const post = await Post.score(comment.postId)
+      const post = await Post.readById(comment.postId);
       const user = await User.score(comment.user.id, points.like * (add ? 1 : -1));
       return res.status(200).json({
-        message: `Comentário ${!add && 'des'}curtido com sucesso!`,
+        message: `Comentário ${add ? '' : 'des'}curtido com sucesso!`,
         payload: {
           user: {
             name: user.username,
@@ -52,7 +76,7 @@ class ScoreController {
           },
           comment: {
             post: {
-              title: post.likes
+              title: post.title
             },
             likes: comment.likes,
             score: comment.score
@@ -64,18 +88,6 @@ class ScoreController {
       return res.status(500).json({
         errors: ['Ocorreu um erro no servidor!']
       });
-    }
-  }
-
-  async comment(comment, add) {
-    try {
-      await User.score(comment.user.id, points.comment * (add ? 1 : -1));
-      const post = await Post.score(comment.postId, points.comment * (add ? 1 : -1));
-      await User.score(post.user.id, points.comment * (add ? 1 : -1));
-
-      return true;
-    } catch (err) {
-      throw new Error(err);
     }
   }
 }

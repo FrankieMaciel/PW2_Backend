@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   profileURL: { type: String, required: true },
-  id: {type: String, required: true}
+  id: { type: String, required: true }
 });
 
 const CommentSchema = new mongoose.Schema({
@@ -65,12 +65,13 @@ class Comment {
     const comment = await CommentModel.findById(id);
 
     const value = add ? 1 : -1;
-    const newScore = add ? 10 : -10;
+    const newScore = add ? 5 : -5;
 
     const edit = {
       likes: comment.likes + value,
       score: comment.score + newScore
     };
+    if (edit.likes < 0 || edit.score < 0) return comment;
     return await CommentModel.findByIdAndUpdate(id, edit, { new: true });
   }
 

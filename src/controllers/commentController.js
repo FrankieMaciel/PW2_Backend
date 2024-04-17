@@ -8,7 +8,7 @@ class CommentController {
     try {
       const comment = new Comment(req.body);
       await comment.create();
-      await scoreController.comment(comment.comment, true)
+      await scoreController.comment(comment.comment.user.id, comment.comment.postId);
       return res.status(200).json({
         message: 'Comentário Criado com sucesso!',
         payload: comment.comment
@@ -65,7 +65,7 @@ class CommentController {
     try {
       const postID = req.params.id;
       const comment = await Comment.delete(postID);
-      await scoreController.comment(comment, false);
+      await scoreController.comment(comment.user.id, comment.postId, false);
       return res.status(200).json({
         message: 'Comentário deletado com sucesso!',
         payload: comment

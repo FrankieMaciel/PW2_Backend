@@ -31,7 +31,7 @@ class Post {
   }
 
   async create() {
-    this.post = await PostModel.create(this.body)
+    this.post = await PostModel.create(this.body);
   }
 
   static async readAll() {
@@ -39,7 +39,7 @@ class Post {
   }
 
   static async readById(id) {
-    if (typeof userName !== 'string') return;
+    if (typeof id !== 'string') return;
     return await PostModel.findById(id);
   }
 
@@ -78,7 +78,8 @@ class Post {
       likes: post.likes + value,
       score: post.score + newScore,
     };
-    await PostModel.findByIdAndUpdate(id, edit, { new: true });
+    if (edit.likes < 0 || edit.score < 0) return post;
+    return await PostModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   static async comment(id, add) {
@@ -92,8 +93,9 @@ class Post {
     const edit = {
       comments: post.comments + value,
       score: post.score + newScore,
-    }
-    return await PostModel.findByIdAndUpdate(id, edit, { new: true })
+    };
+    if (edit.comments < 0 || edit.score < 0) return post;
+    return await PostModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   static async score(id, score) {
@@ -104,7 +106,7 @@ class Post {
     const edit = {
       score: post.score + score
     };
-
+    if (edit.score < 0) return post;
     return await PostModel.findByIdAndUpdate(id, edit, { new: true });
   }
 

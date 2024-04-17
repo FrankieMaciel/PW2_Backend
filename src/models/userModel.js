@@ -101,17 +101,17 @@ class User {
   static async update(id, body) {
     if (typeof id !== 'string') return;
 
-    const user = await UserModel.findById(id);
-    console.log(body);
+    const userData = await UserModel.findById(id);
+    const user = new User(userData);
 
     if (body.password)
-      if (this.body.password.length <= sys.maxPasswordLen && this.body.password.length >= sys.minPasswordLen)
-        this.errors.push(`A senha deve possuir entre ${sys.minPasswordLen} e ${sys.maxPasswordLen} caracteres!`)
+      if (body.password.length <= sys.maxPasswordLen && body.password.length >= sys.minPasswordLen)
+        user.errors.push(`A senha deve possuir entre ${sys.minPasswordLen} e ${sys.maxPasswordLen} caracteres!`)
 
     if (body.email)
-      if (validator.isEmail(this.body.email))
-        this.errors.push('Email inválido!');
-    if (this.errors.length > 0) return;
+      if (validator.isEmail(body.email))
+        user.errors.push('Email inválido!');
+    if (user.errors.length > 0) return user;
 
     const edit = {
       username: body.username || user.username,
@@ -140,6 +140,7 @@ class User {
     const edit = {
       score: user.score + score
     };
+    if (edit.score < 0) return user;
     return await UserModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
