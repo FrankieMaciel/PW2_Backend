@@ -9,9 +9,9 @@ const tokenMiddleware = require(path.resolve(
 
 TM = tokenMiddleware.isAuthenticated;
 
-router.get('/', TM, commentController.readAll);
-router.get('/user/:id', TM, commentController.readByUser);
-router.get('/post/:id', TM, commentController.findPostsComment);
+router.get('/', commentController.readAll);
+router.get('/user/:username', commentController.readByUser);
+router.get('/post/:postId', commentController.findPostsComment);
 router.post('/', TM, commentController.create);
 router.put('/:id', TM, commentController.update);
 router.delete('/:id', TM, commentController.delete);

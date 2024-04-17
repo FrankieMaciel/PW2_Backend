@@ -1,5 +1,5 @@
 const path = require('path');
-const Post = require(path.resolve('..', 'models', 'postModel'));
+const Post = require(path.resolve(__dirname, '..', 'models', 'postModel'));
 
 class FilterPostsController {
     async filterPosts(req, res) {

@@ -1,6 +1,6 @@
 const path = require('path');
 
-const User = require(path.resolve('..', 'models', 'userModel'));
+const User = require(path.resolve(__dirname, '..', 'models', 'userModel'));
 
 class FilterUserController {
   async filterUsers(req, res) {

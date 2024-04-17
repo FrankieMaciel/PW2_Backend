@@ -17,7 +17,7 @@ class PostController {
 
       return res.status(200).json({
         message: 'Post criado com sucesso!',
-        payload: post
+        payload: post.post
       });
     } catch (err) {
       console.log(err);
@@ -56,13 +56,7 @@ class PostController {
 
   async update(req, res) {
     try {
-      const post = Post.update(req.params.id, req.body);
-
-      if (post.errors.length > 0)
-        return res.status(400).json({
-          message: 'Não foi possível editar postagem!',
-          errors: post.errors,
-        });
+      const post = await Post.update(req.params.id, req.body);
 
       return res.status(200).json({
         message: 'Post atualizado com sucesso!',

@@ -13,7 +13,7 @@ const tokenMiddleware = require(path.resolve(
 TM = tokenMiddleware.isAuthenticated;
 
 router.get('/', postController.readAll);
-router.get('/user/:username', TM, postController.readByUser);
+router.get('/user/:username', postController.readByUser);
 router.post('/', TM, postController.create);
 router.put('/:id', TM, postController.update);
 router.delete('/:id', TM, postController.delete);
