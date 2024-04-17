@@ -2,17 +2,10 @@ const path = require('path');
 const express = require('express');
 const router = express.Router();
 
-const postController = require(path.resolve(
-  __dirname, '..', 'controllers', 'postController')
-);
-const scoreController = require(path.resolve(
-  __dirname, '..', 'controllers', 'scoreController')
-);
+const postController = require(path.resolve(__dirname, '..', 'controllers', 'postController'));
+const scoreController = require(path.resolve(__dirname, '..', 'controllers', 'scoreController'));
 
-const tokenMiddleware = require(path.resolve(
-  __dirname, '..', 'middlewares', 'tokenMiddleware')
-);
-
+const tokenMiddleware = require(path.resolve(__dirname, '..', 'middlewares', 'tokenMiddleware'));
 TM = tokenMiddleware.isAuthenticated;
 
 router.get('/', postController.readAll);

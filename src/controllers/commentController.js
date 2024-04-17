@@ -161,7 +161,7 @@ class CommentController {
     }
   };
 
-  async findPostsComment(req, res) {
+  async findPostsComments(req, res) {
     try {
       const postId = req.params.postId;
       const comments = await Comment.findPostsComment(postId);

@@ -3,10 +3,7 @@ const path = require('path');
 const router = express.Router();
 const filterUserController = require('../controllers/filterUserController');
 
-const tokenMiddleware = require(path.resolve(
-  __dirname, '..', 'middlewares', 'tokenMiddleware')
-);
-
+const tokenMiddleware = require(path.resolve(__dirname, '..', 'middlewares', 'tokenMiddleware'));
 TM = tokenMiddleware.isAuthenticated;
 
 router.get('/:username', TM, filterUserController.filterUsers);

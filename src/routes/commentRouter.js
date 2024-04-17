@@ -4,15 +4,12 @@ const router = express.Router();
 const commentController = require('../controllers/commentController');
 const scoreController = require('../controllers/scoreController');
 
-const tokenMiddleware = require(path.resolve(
-  __dirname, '..', 'middlewares', 'tokenMiddleware')
-);
-
+const tokenMiddleware = require(path.resolve(__dirname, '..', 'middlewares', 'tokenMiddleware'));
 TM = tokenMiddleware.isAuthenticated;
 
 router.get('/', commentController.readAll);
 router.get('/user/:username', commentController.readByUser);
-router.get('/post/:postId', commentController.findPostsComment);
+router.get('/post/:postId', commentController.findPostsComments);
 router.post('/', TM, commentController.create);
 router.put('/:id', TM, commentController.update);
 router.put('/like/:id', TM, scoreController.likeComment);
