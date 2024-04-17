@@ -135,13 +135,12 @@ class User {
   static async score(id, score) {
     if (typeof id !== 'string') return;
 
-    let user = await UserModel.findById(id);
+    const user = await UserModel.findById(id);
 
     const edit = {
       score: user.score + score
     };
-    user = await UserModel.findByIdAndUpdate(id, edit, { new: true });
-    return user;
+    return await UserModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
   cleanUp() {

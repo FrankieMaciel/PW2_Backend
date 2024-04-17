@@ -1,16 +1,17 @@
 const path = require('path');
 
 const Comment = require(path.resolve(__dirname, '..', 'models', 'commentModel'));
+const scoreController = require(path.resolve(__dirname, 'scoreController'));
 
 class CommentController {
   async create(req, res) {
     try {
       const comment = new Comment(req.body);
-      
       await comment.create();
+      await scoreController.comment(comment.comment, true)
       return res.status(200).json({
         message: 'Comentário Criado com sucesso!',
-        payload: comment
+        payload: comment.comment
       });
     } catch (err) {
       console.log(err);
@@ -34,7 +35,7 @@ class CommentController {
 
   async readByUser(req, res) {
     try {
-      const user = req.params.id;
+      const user = req.params.username;
       const comments = await Comment.readByUser(user);
       return res.status(200).json(comments);
     } catch (err) {
@@ -64,6 +65,7 @@ class CommentController {
     try {
       const postID = req.params.id;
       const comment = await Comment.delete(postID);
+      await scoreController.comment(comment, false);
       return res.status(200).json({
         message: 'Comentário deletado com sucesso!',
         payload: comment
@@ -91,7 +93,7 @@ class CommentController {
 
   async findPostsComment(req, res) {
     try {
-      const postId = req.params.id;
+      const postId = req.params.postId;
       const comments = await Comment.findPostsComment(postId);
       return res.status(200).json(comments);
     } catch (err) {

@@ -81,6 +81,33 @@ class Post {
     await PostModel.findByIdAndUpdate(id, edit, { new: true });
   }
 
+  static async comment(id, add) {
+    if (typeof id !== 'string') return;
+
+    const post = await PostModel.findById(id);
+
+    const value = add ? 1 : -1;
+    const newScore = add ? 10 : -10;
+
+    const edit = {
+      comments: post.comments + value,
+      score: post.score + newScore,
+    }
+    return await PostModel.findByIdAndUpdate(id, edit, { new: true })
+  }
+
+  static async score(id, score) {
+    if (typeof id !== 'string') return;
+
+    let post = await PostModel.findById(id);
+
+    const edit = {
+      score: post.score + score
+    };
+
+    return await PostModel.findByIdAndUpdate(id, edit, { new: true });
+  }
+
   static async filter(text) {
     return await PostModel.find({ $text: { $search: text } }).sort({ date: -1 });
   }
