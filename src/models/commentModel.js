@@ -65,13 +65,23 @@ class Comment {
     const comment = await CommentModel.findById(id);
 
     const value = add ? 1 : -1;
-    const newScore = add ? 5 : -5;
 
     const edit = {
       likes: comment.likes + value,
-      score: comment.score + newScore
     };
     if (edit.likes < 0 || edit.score < 0) return comment;
+    return await CommentModel.findByIdAndUpdate(id, edit, { new: true });
+  }
+
+  static async score(id, score) {
+    if (typeof id !== 'string') return;
+
+    let comment = await CommentModel.findById(id);
+
+    const edit = {
+      score: comment.score + score
+    };
+    if (edit.score < 0) return comment;
     return await CommentModel.findByIdAndUpdate(id, edit, { new: true });
   }
 

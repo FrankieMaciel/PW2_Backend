@@ -13,7 +13,7 @@ class PostController {
           message: 'Não foi possível criar postagem!',
           errors: post.errors,
         });
-      await scoreController.post(post.post.id);
+      await scoreController.post(post.post.user.id);
 
       return res.status(200).json({
         message: 'Post criado com sucesso!',
@@ -74,7 +74,7 @@ class PostController {
     try {
       const postID = req.params.id;
       const post = await Post.delete(postID);
-      await scoreController.post(postId, false);
+      await scoreController.post(post.user.id, false);
       return res.status(200).json({
         message: 'Post deletado com sucesso!',
         payload: post

@@ -21,9 +21,12 @@ class ScoreController {
 
   async comment(userId, postId, add = true) {
     try {
-      await User.score(userId, points.post * (add ? 1 : -1));
-      await Post.score(postId, points.post * (add ? 1 : -1));
-      await User.score(post.user.id, points.post * (add ? 1 : -1));
+      const post = await Post.readById(postId);
+      if (userId !== post.user.id) {
+        await User.score(userId, points.post * (add ? 1 : -1));
+        await Post.score(postId, points.post * (add ? 1 : -1));
+        await User.score(post.user.id, points.post * (add ? 1 : -1));
+      }
       return;
     } catch (err) {
       throw new Error(err);
@@ -33,10 +36,15 @@ class ScoreController {
   async likePost(req, res) {
     try {
       const id = req.params.id;
-      const add = req.body.add;
+      const { add, userId } = req.body;
 
       const post = await Post.like(id, add);
-      const user = await User.score(post.user.id, points.like * (add ? 1 : -1));
+      const user = await User.readById(post.user.id);
+      if (userId !== user.id) {
+        await Post.score(post.id, points.like * (add ? 1 : -1));
+        await User.score(user.id, points.like * (add ? 1 : -1));
+      }
+
       return res.status(200).json({
         message: `Postagem ${add ? '' : 'des'}curtida com sucesso!`,
         payload: {
@@ -62,11 +70,16 @@ class ScoreController {
   async likeComment(req, res) {
     try {
       const id = req.params.id;
-      const add = req.body.add;
+      const { add, userId } = req.body;
 
       const comment = await Comment.like(id, add);
       const post = await Post.readById(comment.postId);
-      const user = await User.score(comment.user.id, points.like * (add ? 1 : -1));
+      const user = await User.readById(comment.user.id);
+      if (userId !== user.id) {
+        await Comment.score(comment.id, points.like * (add ? 1 : -1));
+        await User.score(user.id, points.like * (add ? 1 : -1));
+      }
+
       return res.status(200).json({
         message: `Comentário ${add ? '' : 'des'}curtido com sucesso!`,
         payload: {

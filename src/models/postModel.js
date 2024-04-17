@@ -72,11 +72,9 @@ class Post {
     const post = await PostModel.findById(id);
 
     const value = add ? 1 : -1;
-    const newScore = add ? 5 : -5;
 
     const edit = {
       likes: post.likes + value,
-      score: post.score + newScore,
     };
     if (edit.likes < 0 || edit.score < 0) return post;
     return await PostModel.findByIdAndUpdate(id, edit, { new: true });
