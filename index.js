@@ -1,6 +1,7 @@
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
 const port = 3001;
@@ -8,6 +9,7 @@ const port = 3001;
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: '*' }));
 
 const router = require(path.resolve(__dirname, 'src', 'routes', 'router'));
 app.use(router);
