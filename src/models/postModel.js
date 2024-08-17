@@ -47,6 +47,13 @@ class Post {
     return posts;
   }
 
+  static async readByUserAndText(userName, text) {
+    if (typeof userName !== 'string') return;
+    if (typeof text !== 'string') return;
+    const posts = await PostModel.find({ 'user.name': userName, content: { $regex: text, $options: 'i' }}).sort({ date: -1 });
+    return posts;
+  }
+
   static async update(id, body) {
     if (typeof id !== 'string') return;
 
