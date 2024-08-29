@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
+const path = require('path');
+
+const User = require(path.resolve(__dirname, 'userModel'));
 
 const PostSchema = new mongoose.Schema({
-  user: {
-    id: { type: String, required: true },
-    name: { type: String, required: true },
-    profileURL: { type: String, required: true },
-  },
+  username: { type: String, required: true },
   title: { type: String, required: true },
   content: { type: String, required: true },
   date: { type: Date, default: Date.now },
@@ -29,29 +28,32 @@ class Post {
   }
 
   async create() {
-    this.post = await PostModel.create(this.body);
+    const post = await PostModel.create(this.body);
+    this.post = await Post.getUserData(post);
   }
 
   static async readAll() {
-    return await PostModel.find().sort({ date: -1 });
+    const posts = await PostModel.find().sort({ date: -1 });
+    return await Post.getUserData(posts);
   }
 
   static async readById(id) {
     if (typeof id !== 'string') return;
-    return await PostModel.findById(id);
+    const post = await PostModel.findById(id);
+    return await Post.getUserData(post);
   }
 
   static async readByUser(userName) {
     if (typeof userName !== 'string') return;
-    const posts = await PostModel.find({ 'user.name': userName }).sort({ date: -1 });
-    return posts;
+    const posts = await PostModel.find({ 'username': userName }).sort({ date: -1 });
+    return await Post.getUserData(posts);
   }
 
   static async readByUserAndText(userName, text) {
     if (typeof userName !== 'string') return;
     if (typeof text !== 'string') return;
-    const posts = await PostModel.find({ 'user.name': userName, content: { $regex: text, $options: 'i' }}).sort({ date: -1 });
-    return posts;
+    const posts = await PostModel.find({ 'username': userName, content: { $regex: text, $options: 'i' } }).sort({ date: -1 });
+    return await Post.getUserData(posts);
   }
 
   static async update(id, body) {
@@ -63,12 +65,14 @@ class Post {
       title: body.title || post.title,
       content: body.content || post.content
     };
-    return await PostModel.findByIdAndUpdate(id, edit, { new: true });
+    const update = await PostModel.findByIdAndUpdate(id, edit, { new: true });
+    return await Post.getUserData(update);
   }
 
   static async delete(id) {
     if (typeof id !== 'string') return;
-    return await PostModel.findByIdAndDelete(id);
+    const post = await PostModel.findByIdAndDelete(id);
+    return await Post.getUserData(post);
   }
 
   static async like(id, add) {
@@ -82,7 +86,8 @@ class Post {
       likes: post.likes + value,
     };
     if (edit.likes < 0 || edit.score < 0) return post;
-    return await PostModel.findByIdAndUpdate(id, edit, { new: true });
+    const update = await PostModel.findByIdAndUpdate(id, edit, { new: true });
+    return await Post.getUserData(update);
   }
 
   static async comment(id, add) {
@@ -98,7 +103,8 @@ class Post {
       score: post.score + newScore,
     };
     if (edit.comments < 0 || edit.score < 0) return post;
-    return await PostModel.findByIdAndUpdate(id, edit, { new: true });
+    const update = await PostModel.findByIdAndUpdate(id, edit, { new: true });
+    return await Post.getUserData(update);
   }
 
   static async score(id, score) {
@@ -110,15 +116,40 @@ class Post {
       score: post.score + score
     };
     if (edit.score < 0) return post;
-    return await PostModel.findByIdAndUpdate(id, edit, { new: true });
+    const update = await PostModel.findByIdAndUpdate(id, edit, { new: true });
+    return await Post.getUserData(update);
   }
 
   static async filter(text) {
-    return await PostModel.find({ $text: { $search: text } }).sort({ date: -1 });
+    const posts = await PostModel.find({ $text: { $search: text } }).sort({ date: -1 });
+    return await Post.getUserData(posts);
   }
 
   static async readFilter(text) {
-    return await PostModel.find({ $text: { $search: text } }.sort({ date: -1 }));
+    const posts = await PostModel.find({ $text: { $search: text } }).sort({ date: -1 });
+    return await Post.getUserData(posts);
+  }
+
+  static async getUserData(data) {
+    if (Array.isArray(data)) {
+      const arr = [];
+      for (const post of data) {
+        const user = await User.readByUsername(post.username);
+        post.user = {
+          name: user.username,
+          profileURL: user.profileURL,
+        };
+        arr.push(post);
+      }
+      return arr;
+    }
+
+    const user = await User.readByUsername(data.username);
+    data.user = {
+      name: user.username,
+      profileURL: user.profileURL,
+    };
+    return data;
   }
 }
 

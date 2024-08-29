@@ -56,7 +56,7 @@ class UserController {
 
       if (user.errors.length > 0)
         return res.status(400).json({
-          message: 'Não foi possível fazer login!',
+          message: 'Email ou senha incorretos!',
           errors: user.errors
         });
 
@@ -109,9 +109,9 @@ class UserController {
     }
   };
 
-  async readById(req, res) {
+  async readByUserName(req, res) {
     try {
-      const user = await User.readById(req.params.id);
+      const user = await User.readByUserName(req.params.userName);
       return res.status(200).json({
         id: user._id,
         username: user.username,
