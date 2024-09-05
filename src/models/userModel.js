@@ -103,9 +103,15 @@ class User {
     return await UserModel.find().sort({ score: -1, name: 1 });
   }
 
-  static async readByUserName(userName) {
-    if (typeof userName !== 'string') return;
-    const user = await UserModel.findOne({ userName });
+  static async readById(id) {
+    if (typeof id !== 'string') return;
+    const user = await UserModel.findById(id);
+    return user;
+  }
+
+  static async readByUsername(username) {
+    if (typeof username !== 'string') return;
+    const user = await UserModel.findOne({ username });
     return user;
   }
 

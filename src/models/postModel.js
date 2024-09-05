@@ -4,7 +4,7 @@ const path = require('path');
 const User = require(path.resolve(__dirname, 'userModel'));
 
 const PostSchema = new mongoose.Schema({
-  username: { type: String, required: true },
+  authorId: { type: String, required: true },
   title: { type: String, required: true },
   content: { type: String, required: true },
   date: { type: Date, default: Date.now },
@@ -43,9 +43,9 @@ class Post {
     return await Post.getUserData(post);
   }
 
-  static async readByUser(userName) {
-    if (typeof userName !== 'string') return;
-    const posts = await PostModel.find({ 'username': userName }).sort({ date: -1 });
+  static async readByUser(id) {
+    if (typeof id !== 'string') return;
+    const posts = await PostModel.find({ 'authorId': id }).sort({ date: -1 });
     return await Post.getUserData(posts);
   }
 
@@ -134,7 +134,7 @@ class Post {
     if (Array.isArray(data)) {
       const arr = [];
       for (const post of data) {
-        const user = await User.readByUsername(post.username);
+        const user = await User.readById(post.authorId);
         post.user = {
           name: user.username,
           profileURL: user.profileURL,
@@ -144,7 +144,7 @@ class Post {
       return arr;
     }
 
-    const user = await User.readByUsername(data.username);
+    const user = await User.readById(data.authorId);
     data.user = {
       name: user.username,
       profileURL: user.profileURL,

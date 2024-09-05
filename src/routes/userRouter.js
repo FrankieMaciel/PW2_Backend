@@ -10,7 +10,7 @@ TM = tokenMiddleware.isAuthenticated;
 const multer = require(path.resolve(__dirname, '..', 'lib', 'multer'));
 
 router.get('/', userController.readAll);
-router.get('/:userName', userController.readByUserName);
+router.get('/:id', userController.readById);
 router.post('/', userController.create);
 router.post('/login', userController.login);
 router.put('/:id', TM, userController.update);

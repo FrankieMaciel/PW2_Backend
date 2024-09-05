@@ -9,7 +9,7 @@ const tokenMiddleware = require(path.resolve(__dirname, '..', 'middlewares', 'to
 TM = tokenMiddleware.isAuthenticated;
 
 router.get('/', postController.readAll);
-router.get('/user/:username', postController.readByUser);
+router.get('/user/:user', postController.readByUser);
 router.post('/', TM, postController.create);
 router.put('/:id', TM, postController.update);
 router.put('/like/:id', TM, scoreController.likePost);

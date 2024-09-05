@@ -88,6 +88,18 @@ class UserController {
 
   async readAll(req, res) {
     try {
+      const username = req.query.name;
+      if (username) {
+        const user = await User.readByUsername(username);
+        return res.status(200).json({
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          profileURL: user.profileURL,
+          score: user.score
+        });
+      }
+
       const users = await User.readAll();
       const arr = users.map(user => {
         return {
@@ -100,6 +112,7 @@ class UserController {
       });
       return res.status(200).json(arr);
     } catch (err) {
+      console.log(err);
       return res.status(500).json({
         errors: [{
           type: ErrorType.SERVER,
@@ -109,9 +122,9 @@ class UserController {
     }
   };
 
-  async readByUserName(req, res) {
+  async readById(req, res) {
     try {
-      const user = await User.readByUserName(req.params.userName);
+      const user = await User.readById(req.params.id);
       return res.status(200).json({
         id: user._id,
         username: user.username,

@@ -7,25 +7,26 @@ const ErrorType = require('../config/ErrorType');
 class PostController {
   async create(req, res) {
     try {
-      const post = new Post(req.body);
-      await post.create();
+      const postClass = new Post(req.body);
+      await postClass.create();
+      const post = postClass.post;
       if (post.errors.length > 0)
         return res.status(400).json({
           message: 'Não foi possível criar postagem!',
           errors: post.errors,
         });
-      await scoreController.post(post.post.user.id);
+      await scoreController.post(post.user.id);
 
       return res.status(200).json({
         message: 'Post criado com sucesso!',
         payload: {
-          id: post.post._id,
-          title: post.post.title,
-          content: post.post.content,
-          likes: post.post.likes,
-          comments: post.post.comments,
-          score: post.post.score,
-          user: post.post.user
+          id: post._id,
+          title: post.title,
+          content: post.content,
+          likes: post.likes,
+          comments: post.comments,
+          score: post.score,
+          user: post.user
         }
       });
     } catch (err) {
@@ -68,8 +69,8 @@ class PostController {
 
   async readByUser(req, res) {
     try {
-      const username = req.params.username;
-      const posts = await Post.readByUser(username);
+      const user = req.params.user;
+      const posts = await Post.readByUser(user);
       const arr = posts.map(post => {
         return {
           id: post._id,
