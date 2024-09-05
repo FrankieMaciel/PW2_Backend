@@ -149,6 +149,7 @@ class Post {
       name: user.username,
       profileURL: user.profileURL,
     };
+    console.log(data);
     return data;
   }
 }
