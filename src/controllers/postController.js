@@ -67,6 +67,32 @@ class PostController {
     }
   };
 
+  async readById(req, res) {
+    try {
+      const postId = req.params.id;
+      const post = await Post.readById(postId);
+      const arr = {
+        id: post._id,
+        title: post.title,
+        content: post.content,
+        likes: post.likes,
+        comments: post.comments,
+        score: post.score,
+        user: post.user
+      };
+
+      return res.status(200).json(arr);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: [{
+          type: ErrorType.SERVER,
+          message: 'Ocorreu um erro no servidor!'
+        }]
+      });
+    }
+  };
+
   async readByUser(req, res) {
     try {
       const user = req.params.user;

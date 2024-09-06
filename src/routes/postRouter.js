@@ -9,6 +9,7 @@ const tokenMiddleware = require(path.resolve(__dirname, '..', 'middlewares', 'to
 TM = tokenMiddleware.isAuthenticated;
 
 router.get('/', postController.readAll);
+router.get('/:id', postController.readById);
 router.get('/user/:user', postController.readByUser);
 router.post('/', TM, postController.create);
 router.put('/:id', TM, postController.update);
