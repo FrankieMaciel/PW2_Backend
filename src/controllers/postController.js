@@ -10,7 +10,7 @@ class PostController {
       const postClass = new Post(req.body);
       await postClass.create();
       const post = postClass.post;
-      if (post.errors.length > 0)
+      if (post.errors && post.errors.length > 0)
         return res.status(400).json({
           message: 'Não foi possível criar postagem!',
           errors: post.errors,
@@ -19,15 +19,7 @@ class PostController {
 
       return res.status(200).json({
         message: 'Post criado com sucesso!',
-        payload: {
-          id: post._id,
-          title: post.title,
-          content: post.content,
-          likes: post.likes,
-          comments: post.comments,
-          score: post.score,
-          user: post.user
-        }
+        payload: post,
       });
     } catch (err) {
       console.log(err);
@@ -43,19 +35,7 @@ class PostController {
   async readAll(req, res) {
     try {
       const posts = await Post.readAll();
-      const arr = posts.map(post => {
-        return {
-          id: post._id,
-          title: post.title,
-          content: post.content,
-          likes: post.likes,
-          comments: post.comments,
-          score: post.score,
-          user: post.user
-        };
-      });
-
-      return res.status(200).json(arr);
+      return res.status(200).json(posts);
     } catch (err) {
       console.log(err);
       return res.status(500).json({
@@ -71,17 +51,7 @@ class PostController {
     try {
       const postId = req.params.id;
       const post = await Post.readById(postId);
-      const arr = {
-        id: post._id,
-        title: post.title,
-        content: post.content,
-        likes: post.likes,
-        comments: post.comments,
-        score: post.score,
-        user: post.user
-      };
-
-      return res.status(200).json(arr);
+      return res.status(200).json(post);
     } catch (err) {
       console.log(err);
       return res.status(500).json({
@@ -97,19 +67,7 @@ class PostController {
     try {
       const user = req.params.user;
       const posts = await Post.readByUser(user);
-      const arr = posts.map(post => {
-        return {
-          id: post._id,
-          title: post.title,
-          content: post.content,
-          likes: post.likes,
-          comments: post.comments,
-          score: post.score,
-          user: post.user
-        };
-      });
-
-      return res.status(200).json(arr);
+      return res.status(200).json(posts);
     } catch (err) {
       console.log(err);
       return res.status(500).json({
@@ -127,15 +85,7 @@ class PostController {
 
       return res.status(200).json({
         message: 'Post atualizado com sucesso!',
-        payload: {
-          id: post._id,
-          title: post.title,
-          content: post.content,
-          likes: post.likes,
-          comments: post.comments,
-          score: post.score,
-          user: post.user
-        }
+        payload: post,
       });
     } catch (err) {
       console.log(err);
@@ -155,15 +105,7 @@ class PostController {
       await scoreController.post(post.user.id, false);
       return res.status(200).json({
         message: 'Post deletado com sucesso!',
-        payload: {
-          id: post._id,
-          title: post.title,
-          content: post.content,
-          likes: post.likes,
-          comments: post.comments,
-          score: post.score,
-          user: post.user
-        }
+        payload: post,
       });
     } catch (err) {
       console.log(err);
@@ -180,18 +122,7 @@ class PostController {
     try {
       const textFilter = req.params.text;
       const posts = await Post.readFilter(textFilter);
-      const arr = posts.map(post => {
-        return {
-          id: post._id,
-          title: post.title,
-          content: post.content,
-          likes: post.likes,
-          comments: post.comments,
-          score: post.score,
-          user: post.user
-        };
-      });
-      return res.status(200).json(arr);
+      return res.status(200).json(posts);
     } catch (err) {
       console.log(err);
       return res.status(500).json({

@@ -7,7 +7,7 @@ const PostSchema = new mongoose.Schema({
   authorId: { type: String, required: true },
   title: { type: String, required: true },
   content: { type: String, required: true },
-  date: { type: Date, default: Date.now },
+  date: { type: Date, default: Date.now() },
   likes: { type: Number, default: 0 },
   comments: { type: Number, default: 0 },
   score: { type: Number, default: 0 }
@@ -29,31 +29,31 @@ class Post {
 
   async create() {
     const post = await PostModel.create(this.body);
-    this.post = await Post.getUserData(post);
+    this.post = await Post.formatPostObject(post);
   }
 
   static async readAll() {
     const posts = await PostModel.find().sort({ date: -1 });
-    return await Post.getUserData(posts);
+    return await Post.formatPostObject(posts);
   }
 
   static async readById(id) {
     if (typeof id !== 'string') return;
     const post = await PostModel.findById(id);
-    return await Post.getUserData(post);
+    return await Post.formatPostObject(post);
   }
 
   static async readByUser(id) {
     if (typeof id !== 'string') return;
     const posts = await PostModel.find({ 'authorId': id }).sort({ date: -1 });
-    return await Post.getUserData(posts);
+    return await Post.formatPostObject(posts);
   }
 
   static async readByUserAndText(userName, text) {
     if (typeof userName !== 'string') return;
     if (typeof text !== 'string') return;
     const posts = await PostModel.find({ 'username': userName, content: { $regex: text, $options: 'i' } }).sort({ date: -1 });
-    return await Post.getUserData(posts);
+    return await Post.formatPostObject(posts);
   }
 
   static async update(id, body) {
@@ -66,13 +66,13 @@ class Post {
       content: body.content || post.content
     };
     const update = await PostModel.findByIdAndUpdate(id, edit, { new: true });
-    return await Post.getUserData(update);
+    return await Post.formatPostObject(update);
   }
 
   static async delete(id) {
     if (typeof id !== 'string') return;
     const post = await PostModel.findByIdAndDelete(id);
-    return await Post.getUserData(post);
+    return await Post.formatPostObject(post);
   }
 
   static async like(id, add) {
@@ -87,7 +87,7 @@ class Post {
     };
     if (edit.likes < 0 || edit.score < 0) return post;
     const update = await PostModel.findByIdAndUpdate(id, edit, { new: true });
-    return await Post.getUserData(update);
+    return await Post.formatPostObject(update);
   }
 
   static async comment(id, add) {
@@ -104,7 +104,7 @@ class Post {
     };
     if (edit.comments < 0 || edit.score < 0) return post;
     const update = await PostModel.findByIdAndUpdate(id, edit, { new: true });
-    return await Post.getUserData(update);
+    return await Post.formatPostObject(update);
   }
 
   static async score(id, score) {
@@ -117,40 +117,49 @@ class Post {
     };
     if (edit.score < 0) return post;
     const update = await PostModel.findByIdAndUpdate(id, edit, { new: true });
-    return await Post.getUserData(update);
+    return await Post.formatPostObject(update);
   }
 
   static async filter(text) {
     const posts = await PostModel.find({ $text: { $search: text } }).sort({ date: -1 });
-    return await Post.getUserData(posts);
+    return await Post.formatPostObject(posts);
   }
 
   static async readFilter(text) {
     const posts = await PostModel.find({ $text: { $search: text } }).sort({ date: -1 });
-    return await Post.getUserData(posts);
+    return await Post.formatPostObject(posts);
   }
 
-  static async getUserData(data) {
+  static async formatPostObject(data) {
     if (Array.isArray(data)) {
       const arr = [];
       for (const post of data) {
         const user = await User.readById(post.authorId);
-        post.user = {
-          name: user.username,
-          profileURL: user.profileURL,
-        };
-        arr.push(post);
+        const { _id, __v, authorId, ...postData } = post._doc;
+        arr.push({
+          id: _id,
+          ...postData,
+          user: {
+            id: user._id,
+            name: user.username,
+            profileURL: user.profileURL,
+          }
+        });
       }
       return arr;
     }
 
     const user = await User.readById(data.authorId);
-    data.user = {
-      name: user.username,
-      profileURL: user.profileURL,
+    const { _id, __v, authorId, ...postData } = data._doc;
+    return {
+      id: _id,
+      ...postData,
+      user: {
+        id: user._id,
+        name: user.name,
+        profileURL: user.profileURL,
+      }
     };
-    console.log(data);
-    return data;
   }
 }
 
