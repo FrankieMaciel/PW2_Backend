@@ -39,10 +39,10 @@ class ScoreController {
       const { add, userId } = req.body;
 
       const post = await Post.like(id, add);
-      const user = await User.readById(post.user.id);
+      const user = await User.readById(post.authorId || post.user.id.toString());
       if (userId !== user.id) {
-        await Post.score(post.id, points.like * (add ? 1 : -1));
-        await User.score(user.id, points.like * (add ? 1 : -1));
+        await Post.score(post.id.toString(), points.like * (add ? 1 : -1));
+        await User.score(user.id.toString(), points.like * (add ? 1 : -1));
       }
 
       return res.status(200).json({
@@ -74,10 +74,10 @@ class ScoreController {
 
       const comment = await Comment.like(id, add);
       const post = await Post.readById(comment.postId);
-      const user = await User.readById(comment.user.id);
+      const user = await User.readById(comment.authorId || comment.user.id.toString());
       if (userId !== user.id) {
-        await Comment.score(comment.id, points.like * (add ? 1 : -1));
-        await User.score(user.id, points.like * (add ? 1 : -1));
+        await Comment.score(comment.id.toString(), points.like * (add ? 1 : -1));
+        await User.score(user.id.toString(), points.like * (add ? 1 : -1));
       }
 
       return res.status(200).json({

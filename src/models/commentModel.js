@@ -1,15 +1,8 @@
 const mongoose = require('mongoose');
-
-const UserSchema = new mongoose.Schema({
-
-});
+const User = require('./userModel');
 
 const CommentSchema = new mongoose.Schema({
-  user: {
-    name: { type: String, required: true },
-    profileURL: { type: String, required: true },
-    id: { type: String, required: true }
-  },
+  authorId: { type: String, required: true },
   postId: { type: String, required: true },
   content: { type: String, required: true },
   likes: { type: Number, default: 0 },
@@ -36,12 +29,14 @@ class Comment {
   }
 
   static async readAll() {
-    return await CommentModel.find().sort({ date: -1 });
+    const comment = await CommentModel.find().sort({ date: -1 });
+    return await this.formatCommentObject(comment);
   }
 
   static async readByUser(userName) {
     if (typeof userName !== 'string') return;
-    return await CommentModel.find({ 'user.name': userName }).sort({ date: -1 });
+    const comment = await CommentModel.find({ 'user.name': userName }).sort({ date: -1 });
+    return await this.formatCommentObject(comment);
   }
 
   static async update(id, body) {
@@ -52,12 +47,14 @@ class Comment {
     const edit = {
       content: body.content || comment.content
     };
-    return await CommentModel.findByIdAndUpdate(id, edit, { new: true });
+    const update = await CommentModel.findByIdAndUpdate(id, edit, { new: true });
+    return await this.formatCommentObject(update);
   }
 
   static async delete(id) {
     if (typeof id !== 'string') return;
-    return await CommentModel.findByIdAndDelete(id);
+    const comment = await CommentModel.findByIdAndDelete(id);
+    return await this.formatCommentObject(comment);
   }
 
   static async like(id, add = true) {
@@ -71,7 +68,8 @@ class Comment {
       likes: comment.likes + value,
     };
     if (edit.likes < 0 || edit.score < 0) return comment;
-    return await CommentModel.findByIdAndUpdate(id, edit, { new: true });
+    const update = await CommentModel.findByIdAndUpdate(id, edit, { new: true });
+    return await this.formatCommentObject(update);
   }
 
   static async score(id, score) {
@@ -83,12 +81,46 @@ class Comment {
       score: comment.score + score
     };
     if (edit.score < 0) return comment;
-    return await CommentModel.findByIdAndUpdate(id, edit, { new: true });
+    const update = await CommentModel.findByIdAndUpdate(id, edit, { new: true });
+    return await this.formatCommentObject(update);
   }
 
   static async findPostsComment(postID) {
     if (typeof postID !== 'string') return;
-    return await CommentModel.find({ postId: postID }).sort({ date: -1 });
+    const comment = await CommentModel.find({ postId: postID }).sort({ date: -1 });
+    return await this.formatCommentObject(comment);
+  }
+
+  static async formatCommentObject(data) {
+    if (Array.isArray(data)) {
+      const arr = [];
+      for (const comment of data) {
+        const user = await User.readById(comment.authorId);
+        const { _id, __v, authorId, ...commentData } = comment._doc;
+        arr.push({
+          id: _id,
+          ...commentData,
+          user: {
+            id: user._id,
+            name: user.username,
+            profileURL: user.profileURL,
+          }
+        });
+      }
+      return arr;
+    }
+
+    const user = await User.readById(data.authorId);
+    const { _id, __v, authorId, ...commentData } = data._doc;
+    return {
+      id: _id,
+      ...commentData,
+      user: {
+        id: user._id,
+        name: user.name,
+        profileURL: user.profileURL,
+      }
+    };
   }
 }
 
