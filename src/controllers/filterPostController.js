@@ -7,18 +7,7 @@ class FilterPostsController {
         try {
             const posts = await Post.filter(text);
             console.log('Consulta bem-sucedida. Posts encontrados:', posts);
-            const arr = posts.map(post => {
-                return {
-                id: post._id,
-                title: post.title,
-                content: post.content,
-                likes: post.likes,
-                comments: post.comments,
-                score: post.score,
-                user: post.user
-                };
-            });
-            return res.status(200).send(arr);
+            return res.status(200).send(posts);
 
         } catch (error) {
             console.error('Erro ao buscar os posts:', error);
@@ -34,18 +23,7 @@ class FilterPostsController {
         try {
             const posts = await Post.readByUserAndText(user, text);
             console.log('Consulta bem-sucedida. Posts encontrados:', posts);
-            const arr = posts.map(post => {
-                return {
-                id: post._id,
-                title: post.title,
-                content: post.content,
-                likes: post.likes,
-                comments: post.comments,
-                score: post.score,
-                user: post.user
-                };
-            });
-            return res.status(200).send(arr);
+            return res.status(200).send(posts);
 
         } catch (error) {
             console.error('Erro ao buscar os posts:', error);
@@ -60,18 +38,7 @@ class FilterPostsController {
         try {
             const posts = await Post.readByUser(user);
             console.log('Consulta bem-sucedida. Posts encontrados:', posts);
-            const arr = posts.map(post => {
-                return {
-                id: post._id,
-                title: post.title,
-                content: post.content,
-                likes: post.likes,
-                comments: post.comments,
-                score: post.score,
-                user: post.user
-                };
-            });
-            return res.status(200).send(arr);
+            return res.status(200).send(posts);
 
         } catch (error) {
             console.error('Erro ao buscar os posts:', error);
@@ -84,19 +51,7 @@ class FilterPostsController {
     async filterAllPosts(req, res) {
         try {
             const posts = await Post.readAll();
-            const arr = posts.map(post => {
-                return {
-                id: post._id,
-                title: post.title,
-                content: post.content,
-                likes: post.likes,
-                comments: post.comments,
-                score: post.score,
-                user: post.user
-                };
-            });
-            console.log(arr)
-            return res.status(200).json(arr);
+            return res.status(200).json(posts);
             } catch (err) {
             console.log(err);
             return res.status(500).json({

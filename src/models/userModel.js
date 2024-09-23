@@ -100,7 +100,8 @@ class User {
   }
 
   static async readAll() {
-    return await UserModel.find().sort({ score: -1, name: 1 });
+    let users =  await UserModel.find().sort({ score: -1, name: 1 });
+    return await User.formatPostObject(users);
   }
 
   static async readById(id) {
@@ -146,7 +147,8 @@ class User {
   }
 
   static async filter(username) {
-    return await UserModel.find({ username: new RegExp(username, 'i') });
+    let users = await UserModel.find({ username: new RegExp(username, 'i') });
+    return await User.formatPostObject(users);
   }
 
   static async delete(id) {
@@ -174,6 +176,25 @@ class User {
       username: this.body.username,
       email: this.body.email,
       password: this.body.password
+    };
+  }
+
+  static async formatPostObject(data) {
+    if (Array.isArray(data)) {
+      const arr = [];
+      for (const user of data) {
+        const { _id, ...userData } = user._doc;
+        arr.push({
+          id: _id.toString(),
+          ...userData,
+        });
+      }
+      return arr;
+    }
+    const { _id, ...userData } = data._doc;
+    return {
+      id: _id.toString(),
+      ...userData,
     };
   }
 }

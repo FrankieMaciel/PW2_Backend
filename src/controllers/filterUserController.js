@@ -9,7 +9,7 @@ class FilterUserController {
     try {
       const users = await User.filter(username);
       console.log('Consulta bem-sucedida. Users encontrados:', users);
-
+      
       return res.status(200).json(users);
 
     } catch (error) {

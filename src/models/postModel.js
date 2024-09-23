@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 
 const User = require(path.resolve(__dirname, 'userModel'));
+const Comment = require(path.resolve(__dirname, 'commentModel'));
 
 const PostSchema = new mongoose.Schema({
   authorId: { type: String, required: true },
@@ -63,7 +64,8 @@ class Post {
 
     const edit = {
       title: body.title || post.title,
-      content: body.content || post.content
+      content: body.content || post.content,
+      comments: body.comments || post.comments
     };
     const update = await PostModel.findByIdAndUpdate(id, edit, { new: true });
     return await Post.formatPostObject(update);
@@ -135,9 +137,11 @@ class Post {
       const arr = [];
       for (const post of data) {
         const user = await User.readById(post.authorId);
+        const commentsNum = await Comment.countComments(post._id.toString());
+        post._doc.comments = commentsNum;
         const { _id, __v, authorId, ...postData } = post._doc;
         arr.push({
-          id: _id,
+          id: _id.toString(),
           ...postData,
           user: {
             id: user._id,
@@ -150,9 +154,11 @@ class Post {
     }
 
     const user = await User.readById(data.authorId);
+    const commentsNum = await Comment.countComments(data._id.toString());
+    data._doc.comments = commentsNum;
     const { _id, __v, authorId, ...postData } = data._doc;
     return {
-      id: _id,
+      id: _id.toString(),
       ...postData,
       user: {
         id: user._id,

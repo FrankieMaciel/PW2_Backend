@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('./userModel');
+const Post = require('./postModel');
 
 const CommentSchema = new mongoose.Schema({
   authorId: { type: String, required: true },
@@ -91,12 +92,18 @@ class Comment {
     return await this.formatCommentObject(comment);
   }
 
+  static async countComments(postID) {
+    if (typeof postID !== 'string') return;
+    const comment = await CommentModel.find({ postId: postID })
+    return comment.length
+  }
+
   static async formatCommentObject(data) {
     if (Array.isArray(data)) {
       const arr = [];
       for (const comment of data) {
         const user = await User.readById(comment.authorId);
-        const { _id, __v, authorId, ...commentData } = comment._doc;
+        const { _id, ...commentData } = comment._doc;
         arr.push({
           id: _id,
           ...commentData,
@@ -111,7 +118,7 @@ class Comment {
     }
 
     const user = await User.readById(data.authorId);
-    const { _id, __v, authorId, ...commentData } = data._doc;
+    const { _id, ...commentData } = data._doc;
     return {
       id: _id,
       ...commentData,
