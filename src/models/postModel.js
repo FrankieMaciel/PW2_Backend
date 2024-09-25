@@ -137,6 +137,7 @@ class Post {
       const arr = [];
       for (const post of data) {
         const user = await User.readById(post.authorId);
+        if (!user) continue;
         const commentsNum = await Comment.countComments(post._id.toString());
         post._doc.comments = commentsNum;
         const { _id, __v, authorId, ...postData } = post._doc;
@@ -154,6 +155,7 @@ class Post {
     }
 
     const user = await User.readById(data.authorId);
+    if (!user) return;
     const commentsNum = await Comment.countComments(data._id.toString());
     data._doc.comments = commentsNum;
     const { _id, __v, authorId, ...postData } = data._doc;
