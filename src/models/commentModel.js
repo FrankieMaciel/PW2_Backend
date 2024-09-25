@@ -103,6 +103,7 @@ class Comment {
       const arr = [];
       for (const comment of data) {
         const user = await User.readById(comment.authorId);
+        if (!user) continue;
         const { _id, ...commentData } = comment._doc;
         arr.push({
           id: _id,
@@ -118,6 +119,7 @@ class Comment {
     }
 
     const user = await User.readById(data.authorId);
+    if (!user) return;
     const { _id, ...commentData } = data._doc;
     return {
       id: _id,
