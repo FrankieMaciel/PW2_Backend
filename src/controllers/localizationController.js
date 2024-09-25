@@ -20,7 +20,7 @@ class LocalizationController {
   };
 
   async update(req, res) {
-    const localization = Localization.update(req.params.id, req.body);
+    const localization = await Localization.update(req.params.id, req.body);
     return res.status(200).json({
       message: 'Localização atualizada com sucesso!',
       payload: localization

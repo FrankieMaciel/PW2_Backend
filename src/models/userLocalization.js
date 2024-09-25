@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const LocalizationSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
+  userId: { type: String, required: true, unique: true },
   lat: {type: String, required: true},
   lon: { type: String, required: true },
 });
@@ -21,21 +21,21 @@ class Localization {
 
   static async readByUser(userID) {
     if (typeof userID !== 'string') return;
-    return await LocalizationModel.find({ 'userID': userID });
+    return await LocalizationModel.find({ 'userId': userID });
   }
 
   static async update(id, body) {
     if (typeof id !== 'string') return;
 
-    const localization = await LocalizationModel.findById(id);
-    let newLat = body.latitude ? body.latitude : localization.latitude;
-    let newLon = body.longitude ? body.longitude : localization.longitude;
+    const localization = await Localization.readByUser(id);
+    let newLat = body.lat ? body.lat : localization.lat;
+    let newLon = body.lon ? body.lon : localization.lon;
 
     const edit = {
       lat: newLat,
       lon: newLon
     };
-    return await LocalizationModel.findByIdAndUpdate(id, edit, { new: true });
+    return await LocalizationModel.findOneAndUpdate({ "userId" : id }, edit, { new: true });
   }
 
   static async delete(id) {
