@@ -3,6 +3,7 @@ const path = require('path');
 const User = require(path.resolve(__dirname, '..', 'models', 'userModel'));
 const Post = require(path.resolve(__dirname, '..', 'models', 'postModel'));
 const Comment = require(path.resolve(__dirname, '..', 'models', 'commentModel'));
+const Like = require('../models/likeModel');
 
 const points = {
   like: 5,
@@ -36,17 +37,21 @@ class ScoreController {
   async likePost(req, res) {
     try {
       const id = req.params.id;
-      const { add, userId } = req.body;
+      const { userId } = req.body;
 
-      const post = await Post.like(id, add);
+      const likeId = await Like.hasLiked({ postId: id, userId });
+      if (likeId) await Like.unlike(likeId);
+      else await Like.like({ postId: id, userId });
+
+      const post = await Post.like(id, !likeId);
       const user = await User.readById(post.authorId || post.user.id.toString());
       if (userId !== user.id) {
-        await Post.score(post.id.toString(), points.like * (add ? 1 : -1));
-        await User.score(user.id.toString(), points.like * (add ? 1 : -1));
+        await Post.score(post.id.toString(), points.like * (likeId ? -1 : 1));
+        await User.score(user.id.toString(), points.like * (likeId ? -1 : 1));
       }
 
       return res.status(200).json({
-        message: `Postagem ${add ? '' : 'des'}curtida com sucesso!`,
+        message: `Postagem ${likeId ? '' : 'des'}curtida com sucesso!`,
         payload: {
           user: {
             name: user.username,
@@ -70,18 +75,22 @@ class ScoreController {
   async likeComment(req, res) {
     try {
       const id = req.params.id;
-      const { add, userId } = req.body;
+      const { userId } = req.body;
 
-      const comment = await Comment.like(id, add);
+      const likeId = await Like.hasLiked({ postId: id, userId });
+      if (likeId) await Like.unlike(likeId);
+      else await Like.like({ postId: id, userId });
+
+      const comment = await Comment.like(id, !likeId);
       const post = await Post.readById(comment.postId);
       const user = await User.readById(comment.authorId || comment.user.id.toString());
       if (userId !== user.id) {
-        await Comment.score(comment.id.toString(), points.like * (add ? 1 : -1));
-        await User.score(user.id.toString(), points.like * (add ? 1 : -1));
+        await Comment.score(comment.id.toString(), points.like * (likeId ? -1 : 1));
+        await User.score(user.id.toString(), points.like * (likeId ? -1 : 1));
       }
 
       return res.status(200).json({
-        message: `Comentário ${add ? '' : 'des'}curtido com sucesso!`,
+        message: `Comentário ${likeId ? '' : 'des'}curtido com sucesso!`,
         payload: {
           user: {
             name: user.username,
@@ -96,6 +105,19 @@ class ScoreController {
           }
         }
       });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        errors: ['Ocorreu um erro no servidor!']
+      });
+    }
+  }
+
+  async findLikes(req, res) {
+    try {
+      const userId = req.params.userId;
+      const likes = await Like.readByUser(userId);
+      return res.status(200).json(likes);
     } catch (err) {
       console.log(err);
       return res.status(500).json({

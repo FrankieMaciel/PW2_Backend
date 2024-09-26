@@ -94,8 +94,8 @@ class Comment {
 
   static async countComments(postID) {
     if (typeof postID !== 'string') return;
-    const comment = await CommentModel.find({ postId: postID })
-    return comment.length
+    const comment = await CommentModel.find({ postId: postID });
+    return comment.length;
   }
 
   static async formatCommentObject(data) {

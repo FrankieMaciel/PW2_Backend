@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const userController = require(path.resolve(__dirname, '..', 'controllers', 'userController'));
+const scoreController = require('../controllers/scoreController');
 
 const tokenMiddleware = require(path.resolve(__dirname, '..', 'middlewares', 'tokenMiddleware'));
 TM = tokenMiddleware.isAuthenticated;
@@ -15,6 +16,8 @@ router.post('/', userController.create);
 router.post('/login', userController.login);
 router.put('/:id', TM, userController.update);
 router.delete('/:id', TM, userController.delete);
+
+router.get('/likes/:userId', TM, scoreController.findLikes);
 
 router.get('/profilePicture/:id', TM, userController.sendProfile);
 router.post('/profilePicture/:id', TM, multer.parser.single('pf-picture'), userController.changeProfile);
